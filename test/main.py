@@ -1,31 +1,32 @@
 import pygame
-
 from camera import Camera
+from fieldgenerator import FieldGenerator
+from drone import Drone
 
 pygame.init()
 
 def Main(display, clock):
-    world = pygame.Surface((scroll_size["WIDTH"], scroll_size["HEIGHT"]))
-    world.fill(colors["BLACK"])
-    for x in range(10):
-        pygame.draw.rect(world, colors["BLUE"], ((x * 100, x * 100), (20, 20)))
-    #
+    field = FieldGenerator(400, 400, initial_infection=1.0)
+
+    drone = Drone(field)
+    drone.run()
+
     camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size )
+    field.run()
 
     while True:
-        clock.tick(60)
+        clock.tick(30)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
 
         camera_pos = camera.move()
-
-        display.fill(colors["WHITE"])  # Fill The Background White To Avoid Smearing
-        world.fill(colors["BLACK"])  # Refresh The World So The Player Doesn't Smear
-        for x in range(10):
-            pygame.draw.rect(world, colors["BLUE"], ((x * 100, x * 100), (20, 20)))
-        display.blit(world, camera_pos)
+        display.fill(colors["WHITE"])
+        surface = pygame.surfarray.make_surface(field.image)
+        # keeps the layer of the image. that is been render.
+        display.blit(surface, camera_pos)
+        drone.render(display, camera_pos)
         pygame.display.flip()
 
 
@@ -40,8 +41,8 @@ if __name__ in "__main__":
     }
     global scroll_size
     scroll_size = {
-        "WIDTH": 3000,
-        "HEIGHT": 3000
+        "WIDTH": 400 * 6, # TODO - make this pixel multiplication constant in entire project. Been spread across multiple classes
+        "HEIGHT": 400 * 6
     }
     global screen_resolution
     screen_resolution = {
@@ -49,7 +50,7 @@ if __name__ in "__main__":
         "HEIGHT": 980
     }
     display = pygame.display.set_mode((screen_resolution["WIDTH"], screen_resolution["HEIGHT"]))
-    pygame.display.set_caption("Scrolling Camera")
+    pygame.display.set_caption("Pestinator")
     clock = pygame.time.Clock()
 
     Main(display, clock)

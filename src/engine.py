@@ -39,7 +39,7 @@ class Engine:
             pygame.time.delay(10)
 
             # iterate over the list of Event objects
-            # that was returned by pygame.event.get() method.
+            # that was returned by pygame.event.py.get() method.
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:

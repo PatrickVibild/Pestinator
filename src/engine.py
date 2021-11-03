@@ -6,7 +6,6 @@ class Engine:
     x_dim: int
     y_dim: int
 
-
     def __init__(self):
         self.x_dim = 1200
         self.y_dim = 1000
@@ -73,6 +72,7 @@ class Engine:
 
         # closes the pygame window
         pygame.quit()
+
 
     def __run_agents(self):
         for agent in self.agents:

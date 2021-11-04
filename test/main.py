@@ -8,8 +8,11 @@ pygame.init()
 def Main(display, clock):
     field = FieldGenerator(400, 400, initial_infection=1.0)
 
-    drone = Drone(field)
-    drone.run()
+    drone_scan = Drone(field, 'scan')
+    drone_scan.run()
+
+    drone_spray = Drone(field, 'spray')
+    drone_spray.run()
 
     camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size )
     field.run()
@@ -26,7 +29,8 @@ def Main(display, clock):
         surface = pygame.surfarray.make_surface(field.image)
         # keeps the layer of the image. that is been render.
         display.blit(surface, camera_pos)
-        drone.render(display, camera_pos)
+        drone_scan.render(display, camera_pos)
+        drone_spray.render(display, camera_pos)
         pygame.display.flip()
 
 

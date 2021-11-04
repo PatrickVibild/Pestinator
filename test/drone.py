@@ -8,13 +8,14 @@ import threading
 
 
 class Drone:
-    def __init__(self, world: FieldGenerator, speed=2):
+    def __init__(self, world: FieldGenerator, type, speed=2):
         self.area_x = world.i
         self.area_y = world.j
         self.speed = speed  # TODO to be used somewhere?
         self.position_x = 0  # TODO change this, for testing starting in the mid of the field
         self.position_y = 0
         self.field = world.field
+        self.type = type
 
     def fly_direction(self, x, y):
         self.position_x += x
@@ -41,10 +42,27 @@ class Drone:
             self.scan_and_spray()
             time.sleep(0.2)
 
+    def scan(self):
+        while True:
+            self.fly_direction(1, 0)
+            self.scan_and_spray()
+            time.sleep(0.2)
+
+    def spray(self):
+        while True:
+            self.fly_direction(1, 0)
+            self.scan_and_spray()
+            time.sleep(0.2)
+
     def render(self, display, camera_pos):
         x, y = camera_pos
         pygame.draw.circle(display, (0, 0, 255), (self.position_x * 6 + x, self.position_y * 6 + y), 8)
 
     def run(self):
-        t1 = threading.Thread(target=self.random_fly)
-        t1.start()
+        if self.type == 'scan':
+            t1 = threading.Thread(target=self.scan)
+            t1.start()
+        if self.type == 'spray':
+            t2 = threading.Thread(target=self.spray)
+            t2.start()
+

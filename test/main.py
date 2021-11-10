@@ -2,13 +2,18 @@ import pygame
 from camera import Camera
 from fieldgenerator import FieldGenerator
 from drone import Drone
+from chargestation import ChargeStation
 
 pygame.init()
 
 def Main(display, clock):
     field = FieldGenerator(400, 400, initial_infection=1.0)
 
-    drone = Drone(field)
+    #charge station position
+    x, y , length, width = 1100, 1100, 200, 200
+    chargestation = ChargeStation(x, y, length, width)
+
+    drone = Drone(field, (x, y, length, width))
     drone.run()
 
     camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size )
@@ -26,9 +31,19 @@ def Main(display, clock):
         surface = pygame.surfarray.make_surface(field.image)
         # keeps the layer of the image. that is been render.
         display.blit(surface, camera_pos)
+        chargestation.render(display, (chargestation.position_x, chargestation.position_y), (chargestation.length, chargestation.width))
         drone.render(display, camera_pos)
         pygame.display.flip()
 
+        #get battery info
+        chargestation.get_charge(drone.battery)
+        if chargestation.charge_flag[0] == 1:
+            chargestation.run()
+        if chargestation.charge_flag[0] == 0 and chargestation.battery[0] == 100:
+            drone.battery = chargestation.battery[0]
+            chargestation.battery[0] = 0
+            chargestation.slot[0] = 0
+            drone.run()
 
 if __name__ in "__main__":
     global colors
@@ -46,9 +61,10 @@ if __name__ in "__main__":
     }
     global screen_resolution
     screen_resolution = {
-        "WIDTH": 1820,
-        "HEIGHT": 980
+        "WIDTH": 1920,
+        "HEIGHT": 1080
     }
+
     display = pygame.display.set_mode((screen_resolution["WIDTH"], screen_resolution["HEIGHT"]))
     pygame.display.set_caption("Pestinator")
     clock = pygame.time.Clock()

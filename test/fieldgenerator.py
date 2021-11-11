@@ -49,5 +49,5 @@ class FieldGenerator(Observer):
 
     def cure(self, coordinates):
         i, j = coordinates
-        print('Cleaning crop{0}, {1}'.format(str(i), str(j)))
+        #print('Cleaning crop{0}, {1}'.format(str(i), str(j)))
         self.change_crop_value(i, j, 0.0)

@@ -1,0 +1,12 @@
+.idea/misc.xml
+.idea/modules.xml
+.idea/Pestinator.iml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+src/__pycache__/engine.cpython-310.pyc
+src/pestinator/action/__pycache__/random_agent.cpython-310.pyc
+test/__pycache__/camera.cpython-310.pyc
+test/__pycache__/drone.cpython-310.pyc
+test/__pycache__/event.cpython-310.pyc
+test/__pycache__/fieldgenerator.cpython-310.pyc
+test/__pycache__/observer.cpython-310.pyc

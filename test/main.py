@@ -6,7 +6,7 @@ from drone import Drone
 pygame.init()
 
 def Main(display, clock):
-    field = FieldGenerator(400, 400, initial_infection=1.0)
+    field = FieldGenerator(150, 150, initial_infection=1.0)
 
     drone_scan = Drone(field, 'scan')
     drone_scan.run()
@@ -45,13 +45,13 @@ if __name__ in "__main__":
     }
     global scroll_size
     scroll_size = {
-        "WIDTH": 400 * 6, # TODO - make this pixel multiplication constant in entire project. Been spread across multiple classes
-        "HEIGHT": 400 * 6
+        "WIDTH": 150 * 6, # TODO - make this pixel multiplication constant in entire project. Been spread across multiple classes
+        "HEIGHT": 150 * 6
     }
     global screen_resolution
     screen_resolution = {
-        "WIDTH": 1820,
-        "HEIGHT": 980
+        "WIDTH": 1000,
+        "HEIGHT": 1000
     }
     display = pygame.display.set_mode((screen_resolution["WIDTH"], screen_resolution["HEIGHT"]))
     pygame.display.set_caption("Pestinator")

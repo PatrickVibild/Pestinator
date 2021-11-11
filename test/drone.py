@@ -31,7 +31,7 @@ class Drone:
         print('Drone at {0}, {1}'.format(str(self.position_x), str(self.position_y)))
 
     def scan_and_spray(self):
-        infection = self.field[self.position_x][self.position_y].infection
+        infection = self.field[self.position_x][self.position_y]
         print('Scanning field - ' + str(infection))
         if infection > 0.20:
             Event('spray', [self.position_x, self.position_y])

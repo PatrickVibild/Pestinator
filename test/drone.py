@@ -6,7 +6,7 @@ from fieldgenerator import FieldGenerator
 from event import Event
 import threading
 from observer import Observer
-import numpy as np
+import math
 
 
 class Drone(Observer):
@@ -19,7 +19,7 @@ class Drone(Observer):
         self.field = world.field
         self.type = type
         self.base_coordinates = [0,0]
-        self.battery = 100
+        self.battery = 1000
         if type == 'spray':
             Observer.__init__(self)
             self.observe('sick_plant', self.add_sick_plant) # Listening to events 'spray' and calling method cure if trigger
@@ -37,7 +37,6 @@ class Drone(Observer):
             self.position_x = self.area_x
         if self.position_y > self.area_y:
             self.position_y = self.area_y
-        #print('Drone at {0}, {1}'.format(str(self.position_x), str(self.position_y)))
 
     def scan_and_spray(self):
         infection = self.field[self.position_x][self.position_y]
@@ -45,24 +44,20 @@ class Drone(Observer):
         if infection > 0.20:
             Event('spray', [self.position_x, self.position_y])
 
-    def random_fly(self):
-        while True:
-            self.fly_direction(1, 0)
-            self.scan_and_spray()
-            time.sleep(0.2)
 
     def scan(self):
         while True:
             self.fly_direction(1, 0)
-            self.scan_and_spray()
-            time.sleep(0.2)
+            time.sleep(5)
 
     def spraying_routine(self):
         print(len(self.sick_plants))
         print(len(self.sick_plants[0]))
         Event('sick_plant', [10, 10])
         Event('sick_plant', [50, 50])
+        Event('sick_plant', [75, 100])
         Event('sick_plant', [100, 100])
+        Event('sick_plant', [140, 100])
         print(self.sick_coordinate_list)
         while True:
             if len(self.sick_coordinate_list) > 2:
@@ -70,12 +65,28 @@ class Drone(Observer):
             time.sleep(0.2)
     
     def go_and_spray(self):
-        print ("Let's spray!")
-        while len(self.sick_coordinate_list) > 0:
+        print ("Enough plants - let's spray!")
+        while len(self.sick_coordinate_list) > 0 and self.enough_charge():
             self.goto_point(self.sick_coordinate_list.pop(0))
+        self.return_charger()
             
     def return_charger(self):
-        self.goto_point([0,0])
+        i,j = self.base_coordinates
+        while ((self.position_x != i) or (self.position_y != j)):
+            if self.position_x < i:
+                self.position_x += 1
+                self.battery -= 1
+            elif self.position_x > i:
+                self.position_x -= 1
+                self.battery -= 1
+                
+            if self.position_y < j:
+                self.position_y += 1
+                self.battery -= 1
+            elif self.position_y > j:
+                self.position_y -= 1
+                self.battery -= 1
+            time.sleep(0.2)
         
     def goto_point(self,coordinates):
         #Go to 
@@ -83,28 +94,42 @@ class Drone(Observer):
         print(coordinates)
         
         i,j = coordinates
-        while (self.position_x != i) or (self.position_y != j):
+        while ((self.position_x != i) or (self.position_y != j)) and self.enough_charge():
             if self.position_x < i:
                 self.position_x += 1
+                self.battery -= 1
             elif self.position_x > i:
                 self.position_x -= 1
+                self.battery -= 1
                 
-            if self.position_y < i:
+            if self.position_y < j:
                 self.position_y += 1
-            elif self.position_y > i:
+                self.battery -= 1
+            elif self.position_y > j:
                 self.position_y -= 1
+                self.battery -= 1
             time.sleep(0.2)
-        print("Position reached!")
-        
+        if [self.position_x,self.position_y] == coordinates:
+            print("Position reached!")
+            print("Spraying...")
+            Event('spray', [self.position_x, self.position_y])
+        elif self.enough_charge() == False:
+            print("Not enough charge - returning to base")
+
     def enough_charge(self):
-        if (self.battery < self.distance_to_base):
+        #print("Battery status: ")
+        #print(self.battery)
+        if (self.battery > self.distance_to_base()+5):
             return True
-        else: 
+        else:
             return False
         
     def distance_to_base(self):
         dronePos = [self.position_x,self.position_y]
-        return np.linalg.norm(dronePos - self.base_coordinates)
+        distance = math.dist(dronePos, self.base_coordinates)
+       # print("Distance to base: ")
+       # print (distance)
+        return distance
     
     def add_sick_plant(self,coordinates):
         i, j = coordinates

@@ -2,6 +2,7 @@ import pygame
 from camera import Camera
 from fieldgenerator import FieldGenerator
 from drone import Drone
+from chargestation import ChargeStation
 
 pygame.init()
 
@@ -28,6 +29,16 @@ def Main(display, clock):
         display.blit(surface, camera_pos)
         drone.render(display, camera_pos)
         pygame.display.flip()
+
+        #get battery info
+        chargestation.get_charge(drone.battery)
+        if chargestation.charge_flag[0] == 1:
+            chargestation.run()
+        if chargestation.charge_flag[0] == 0 and chargestation.battery[0] == 100:
+            drone.battery = chargestation.battery[0]
+            chargestation.battery[0] = 0
+            chargestation.slot[0] = 0
+            drone.run()
 
 
 if __name__ in "__main__":

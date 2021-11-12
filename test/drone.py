@@ -14,6 +14,7 @@ class Drone:
         self.speed = speed  # TODO to be used somewhere?
         self.position_x = 0  # TODO change this, for testing starting in the mid of the field
         self.position_y = 0
+        self.battery = 100
         self.field = world.field
 
     def fly_direction(self, x, y):
@@ -39,6 +40,10 @@ class Drone:
         while True:
             self.fly_direction(1, 0)
             self.scan_and_spray()
+            self.battery -= 1
+            print('battery: ', self.battery)
+            if self.battery == None:
+                self.battery = 0
             time.sleep(0.2)
 
     def render(self, display, camera_pos):

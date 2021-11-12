@@ -5,6 +5,7 @@ import csv
 import random
 
 
+
 #%%
 
 #%%
@@ -119,6 +120,9 @@ class forecast:
         wind_direction = round(random.random(),2)*360
         return wind_speed, wind_direction
 
+    def class_pub(self):
+        
+
     def predict(self, month, day, time):
         self.seed= self.load_seed()
         M = getattr(self.seed, self.month_dict[int(month)])
@@ -150,7 +154,15 @@ class forecast:
             print("Night")
         else: print("Day")
 
-
+    def run(self):
+        month = int(input("Starting month (number): "))
+        day = int(input("Starting day (number): "))
+        hour = float(input("Starting hour (number): "))
+        interv = float(input("Simulation interval: "))
+        fc=Forecast()
+        seed = fc.Seed()
+        while True:
+            
 
 #%%
 if __name__ == '__main__':

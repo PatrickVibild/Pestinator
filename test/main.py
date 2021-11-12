@@ -9,6 +9,10 @@ pygame.init()
 def Main(display, clock):
     field = FieldGenerator(400, 400, initial_infection=1.0)
 
+    # charge station position
+    x, y, length, width = 1100, 1100, 200, 200
+    chargestation = ChargeStation(x, y, length, width)
+
     drone = Drone(field)
     drone.run()
 

@@ -15,7 +15,7 @@ class Drone:
         self.position_x = 0  # TODO change this, for testing starting in the mid of the field
         self.position_y = 0
         self.battery = 100
-        self.field = world.field
+        self.field = world
 
     def fly_direction(self, x, y):
         self.position_x += x
@@ -31,18 +31,18 @@ class Drone:
         print('Drone at {0}, {1}'.format(str(self.position_x), str(self.position_y)))
 
     def scan_and_spray(self):
-        infection = self.field[self.position_x][self.position_y]
+        infection = self.field.obtain_crop_value(self.position_x, self.position_y)
         print('Scanning field - ' + str(infection))
         if infection > 0.20:
             Event('spray', [self.position_x, self.position_y])
 
     def random_fly(self):
-        while True:
+        while self.battery > 0:
             self.fly_direction(1, 0)
             self.scan_and_spray()
             self.battery -= 1
             print('battery: ', self.battery)
-            if self.battery == None:
+            if self.battery is None:
                 self.battery = 0
             time.sleep(0.2)
 

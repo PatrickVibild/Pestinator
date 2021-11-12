@@ -20,15 +20,14 @@ class FieldGenerator(Observer):
     def __init__(self, i, j, initial_infection=0.01):
         Observer.__init__(self)
         self.observe('spray', self.cure) # Listening to events 'spray' and calling method cure if trigger
-        self.observe('sick_plant', self.infect)
+        self.observe('create_sick_plant', self.infect)
         self.i = i
         self.j = j
         self._field = [[(fastrand.pcg32bounded(10000) / 10000) for x in range(i)] for y in range(j)]
         self._image = numpy.zeros((self.i * 6, self.j * 6, 3))
         for y in range(self.j):
             for x in range(self.i):
-                cell_color = crop_color(self._field[x][y])
-                #cell_color = crop_color(self.field[x][y])
+                # cell_color = crop_color(self._field[x][y])
                 cell_color = crop_color(0)
                 for n in range(6):
                     for m in range(6):

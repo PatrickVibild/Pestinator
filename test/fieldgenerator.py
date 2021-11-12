@@ -31,6 +31,7 @@ class FieldGenerator(Observer):
                     for m in range(6):
                         self.image[(x * 6) + n][(y * 6) + m] = cell_color
 
+    # delete me
     def change_crop_value(self, i, j, value):
         self.field[i][j] = value
         cell_color = crop_color(value)

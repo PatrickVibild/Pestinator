@@ -13,8 +13,6 @@ def Main(display, clock):
     x, y, length, width = 1100, 1100, 200, 200
     chargestation = ChargeStation(x, y, length, width)
 
-    drone = Drone(field)
-    drone.run()
     drone_scan = Drone(field, 'scan')
     drone_scan.run()
 
@@ -41,14 +39,14 @@ def Main(display, clock):
         pygame.display.flip()
 
         #get battery info
-        chargestation.get_charge(drone.battery)
-        if chargestation.charge_flag[0] == 1:
-            chargestation.run()
-        if chargestation.charge_flag[0] == 0 and chargestation.battery[0] == 100:
-            drone.battery = chargestation.battery[0]
-            chargestation.battery[0] = 0
-            chargestation.slot[0] = 0
-            drone.run()
+  #      chargestation.get_charge(drone.battery)
+   #     if chargestation.charge_flag[0] == 1:
+   #         chargestation.run()
+   #     if chargestation.charge_flag[0] == 0 and chargestation.battery[0] == 100:
+   #         drone.battery = chargestation.battery[0]
+   #         chargestation.battery[0] = 0
+   #         chargestation.slot[0] = 0
+   #         drone.run()
 
 
 if __name__ in "__main__":

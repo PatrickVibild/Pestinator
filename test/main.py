@@ -7,7 +7,7 @@ from chargestation import ChargeStation
 pygame.init()
 
 def Main(display, clock):
-    field = FieldGenerator(150, 150, initial_infection=1.0)
+    field = FieldGenerator(150, 150, initial_infection=-0.2)
 
     # charge station position
     x, y, length, width = 1100, 1100, 200, 200

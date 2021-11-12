@@ -24,8 +24,7 @@ class Drone(Observer):
         self.battery = 1000
         if type == 'spray':
             Observer.__init__(self)
-            self.observe('sick_plant',
-                         self.add_sick_plant)  # Listening to events 'spray' and calling method cure if trigger
+            self.observe('sick_plant', self.add_sick_plant)
             self.sick_plants = [[0 for c in range(world.i)] for r in range(world.j)]
             self.sick_coordinate_list = []
 
@@ -54,21 +53,13 @@ class Drone(Observer):
     def scan(self):
         while True:
             self.fly_direction()
-            print("scan_x: " + str(self.position_x))
-            print("scan_y: " + str(self.position_y))
+            # print("scan_x: " + str(self.position_x))
+            # print("scan_y: " + str(self.position_y))
             if self.field.obtain_crop_value(self.position_x, self.position_y) > pest_threshold:
                 Event('sick_plant', [self.position_x, self.position_y])
             time.sleep(0.2)
 
     def spraying_routine(self):
-        print(len(self.sick_plants))
-        print(len(self.sick_plants[0]))
-        Event('create_sick_plant', [10, 0])
-        Event('create_sick_plant', [20, 0])
-        Event('create_sick_plant', [35, 0])
-        Event('create_sick_plant', [30, 1])
-        Event('create_sick_plant', [40, 1])
-        print(self.sick_coordinate_list)
         while True:
             if len(self.sick_coordinate_list) > 1:
                 self.go_and_spray()
@@ -100,8 +91,8 @@ class Drone(Observer):
 
     def goto_point(self, coordinates):
         # Go to
-        print("Going to point: ")
-        print(coordinates)
+        # print("Going to point: ")
+        # print(coordinates)
 
         i, j = coordinates
         while ((self.position_x != i) or (self.position_y != j)) and self.enough_charge():

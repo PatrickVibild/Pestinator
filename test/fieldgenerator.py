@@ -1,6 +1,5 @@
 import time
 
-import fastrand
 import numpy
 import threading
 from observer import Observer
@@ -16,16 +15,17 @@ def crop_color(infection: float):
     return (255, 255, 255)
 
 
+def bound(value):
+    return max(min(value, 0.9), 0)
+
+
 class FieldGenerator(Observer):
-    def __init__(self, i, j, initial_infection=0.01):
+    def __init__(self, i, j, initial_infection=0.0):
         Observer.__init__(self)
         self.observe('spray', self.cure) # Listening to events 'spray' and calling method cure if trigger
-        self.observe('create_sick_plant', self.infect)
         self.i = i
         self.j = j
-        #Clean for testing
-       # self._field = [[(fastrand.pcg32bounded(10000) / 10000) for x in range(i)] for y in range(j)] 
-        self._field = [[0 for x in range(i)] for y in range(j)] 
+        self._field = [[bound(numpy.random.lognormal(0, 1) / 10 + initial_infection) for x in range(i)] for y in range(j)]
         self._image = numpy.zeros((self.i * 6, self.j * 6, 3))
         for y in range(self.j):
             for x in range(self.i):
@@ -72,7 +72,3 @@ class FieldGenerator(Observer):
         print('Cleaning crop{0}, {1}'.format(str(i), str(j)))
         self.change_crop_value(i, j, 0.0)
 
-    def infect(self, coordinates):
-        i, j = coordinates
-        print('Infecting crop{0}, {1}'.format(str(i), str(j)))
-        self.change_crop_value(i, j, 0.9)

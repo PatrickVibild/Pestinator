@@ -48,6 +48,7 @@ class Drone(Observer):
     def scan(self):
         while True:
             self.fly_direction(1, 0)
+            if self.field >
             time.sleep(5)
 
     def spraying_routine(self):

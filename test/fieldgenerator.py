@@ -47,7 +47,7 @@ class FieldGenerator(Observer):
     def infest(self, kernel):
         # TODO thread this function
         time.sleep(5)
-        copy_field = self.field
+        copy_field = self._field
         for x in range(len(copy_field)):
             for y in range(len(copy_field[x])):
                 total = 0

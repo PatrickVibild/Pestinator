@@ -44,10 +44,21 @@ class FieldGenerator(Observer):
             for m in range(6):
                 self._image[(i * 6) + n][(j * 6) + m] = cell_color
 
-    def infest(self):
-        while True:
-            time.sleep(5)
-            # TODO implement the pest spread
+    def infest(self, kernel):
+        # TODO thread this function
+        time.sleep(5)
+        copy_field = self.field
+        for x in range(len(copy_field)):
+            for y in range(len(copy_field[x])):
+                total = 0
+                for m in range(len(kernel)):
+                    if x+m-1 < 0 or x+m-1 >= len(copy_field):
+                        continue
+                    for n in range(len(kernel[m])):
+                        if y+n-1 < 0 or y+n-1 >= len(copy_field[x]):
+                            continue
+                        total += copy_field[x+m-1][y+n-1] * kernel[m][n]
+                self.change_crop_value(x, y, total)
 
     def run(self):
         t1 = threading.Thread(target=self.infest)

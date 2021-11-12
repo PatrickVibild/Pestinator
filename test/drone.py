@@ -45,7 +45,10 @@ class Drone:
     def scan(self):
         while True:
             self.fly_direction(1, 0)
-            self.scan_and_spray()
+            '''
+            if FieldGenerator.getCropValue() > 30:
+                Event('sick_plant',[self.position_x, self.position_y])
+            '''
             time.sleep(0.2)
 
     def spray(self):

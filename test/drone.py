@@ -65,12 +65,12 @@ class Drone(Observer):
         print(len(self.sick_plants[0]))
         Event('create_sick_plant', [10, 0])
         Event('create_sick_plant', [20, 0])
-        Event('create_sick_plant', [75, 100])
-        Event('create_sick_plant', [100, 100])
-        Event('create_sick_plant', [140, 100])
+        Event('create_sick_plant', [35, 0])
+        Event('create_sick_plant', [30, 1])
+        Event('create_sick_plant', [40, 1])
         print(self.sick_coordinate_list)
         while True:
-            if len(self.sick_coordinate_list) > 2:
+            if len(self.sick_coordinate_list) > 1:
                 self.go_and_spray()
             time.sleep(0.2)
 

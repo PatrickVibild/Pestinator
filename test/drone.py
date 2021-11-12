@@ -25,8 +25,12 @@ class Drone(Observer):
         if type == 'spray':
             Observer.__init__(self)
             self.observe('sick_plant', self.add_sick_plant)
+            self.observe('Charge finished', self.get_battery)
             self.sick_plants = [[0 for c in range(world.i)] for r in range(world.j)]
             self.sick_coordinate_list = []
+
+    def get_battery(self, battery):
+        self.battery = battery
 
     def fly_direction(self):
         if self.position_y % 2 == 0:
@@ -88,6 +92,7 @@ class Drone(Observer):
                 self.position_y -= 1
                 self.battery -= 1
             time.sleep(0.2)
+        Event('need to charge', self.battery)
 
     def goto_point(self, coordinates):
         # Go to

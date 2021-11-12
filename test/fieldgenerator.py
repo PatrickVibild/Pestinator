@@ -23,12 +23,13 @@ class FieldGenerator(Observer):
         self.observe('create_sick_plant', self.infect)
         self.i = i
         self.j = j
-        self._field = [[(fastrand.pcg32bounded(10000) / 10000) for x in range(i)] for y in range(j)]
+        #Clean for testing
+       # self._field = [[(fastrand.pcg32bounded(10000) / 10000) for x in range(i)] for y in range(j)] 
+        self._field = [[0 for x in range(i)] for y in range(j)] 
         self._image = numpy.zeros((self.i * 6, self.j * 6, 3))
         for y in range(self.j):
             for x in range(self.i):
-                # cell_color = crop_color(self._field[x][y])
-                cell_color = crop_color(0)
+                cell_color = crop_color(self._field[x][y])
                 for n in range(6):
                     for m in range(6):
                         self._image[(x * 6) + n][(y * 6) + m] = cell_color

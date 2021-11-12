@@ -32,17 +32,17 @@ class Drone(Observer):
     def fly_direction(self):
         if self.position_y % 2 == 0:
             self.position_x += 1
+            if self.position_x > self.area_x:
+                self.position_x = self.area_x
+        if self.position_x == self.area_x:
+            self.position_y += 1
         if self.position_y % 2 == 1:
             self.position_x -= 1
-        if self.position_x < 0:
-            self.position_x = 0
+            if self.position_x < 0:
+                self.position_x = 0
+        if self.position_x == 0:
             self.position_y += 1
-        # if self.position_y < 0:
-        #    self.position_y = 0
-        if self.position_x > self.area_x:
-            self.position_x = self.area_x
-            self.position_y += 1
-        if self.position_y > self.area_y:
+        if self.position_y >= self.area_y:
             self.position_y = self.area_y
 
     def scan_and_spray(self):
@@ -54,6 +54,8 @@ class Drone(Observer):
     def scan(self):
         while True:
             self.fly_direction()
+            print("scan_x: " + str(self.position_x))
+            print("scan_y: " + str(self.position_y))
             if self.field.obtain_crop_value(self.position_x, self.position_y) > pest_threshold:
                 Event('sick_plant', [self.position_x, self.position_y])
             time.sleep(0.2)

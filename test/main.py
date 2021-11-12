@@ -26,7 +26,7 @@ def Main(display, clock):
 
         camera_pos = camera.move()
         display.fill(colors["WHITE"])
-        surface = pygame.surfarray.make_surface(field.image)
+        surface = pygame.surfarray.make_surface(field.obtain_render_image())
         # keeps the layer of the image. that is been render.
         display.blit(surface, camera_pos)
         drone_scan.render(display, camera_pos)

@@ -1,34 +1,34 @@
-import time
-import pygame
 import threading
-from event import Event
+import time
 from observer import Observer
+from test.drone import Drone
 
 
 class ChargeStation(Observer):
-    def __init__(self, position_x, position_y, length, width):
-        self.position_x = position_x
-        self.position_y = position_y
-        self.length = length
-        self.width = width
-        self.battery = 0
-        self.charge_flag = 0
+    def __init__(self, capacity, charging_speed):
         Observer.__init__(self)
-        self.observe('need to charge', self.charge)
-        #self.observe('need to leave')
+        self.observe('charge', self.charge)
+        self.active_drones = []
+        self.charging_speed = charging_speed
+        self.capacity = capacity
 
-    def render(self, display, position, size):
-        pygame.draw.rect(display, (104, 85, 108), (position, size), 0)
+    def charge(self, drone: Drone):
+        if len(self.active_drones) < self.capacity:
+            drone.is_charging = True
+            self.capacity += 1
+            self.active_drones.append(drone)
 
-    def charge(self, battery):
-        self.battery = battery
-        while self.battery < 1000:
-            self.battery += 2
-            print('charging: ', self.battery)
+    def routine(self):
+        while True:
             time.sleep(0.2)
-        Event('Charge finished', self.battery)
+            for drone in self.active_drones:
+                if drone.battery >= drone.battery_capacity:
+                    drone.is_charging = False
+                    self.active_drones.remove(drone)
+                    self.capacity -= 1
+                else:
+                    drone.battery += self.charging_speed
 
-
-    #def run(self):
-    #    t1 = threading.Thread(target=self.charge()
-    #    t1.start()
+    def run(self):
+        t1 = threading.Thread(target=self.routine)
+        t1.start()

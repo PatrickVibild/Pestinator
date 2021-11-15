@@ -1,159 +1,64 @@
+import math
 import time
 
 import pygame
+from test.fieldgenerator import FieldGenerator
+from abc import ABC, abstractmethod
 
-from fieldgenerator import FieldGenerator
-from event import Event
-import threading
-from observer import Observer
-import math
-
-pest_threshold = 0.2
+from test.event import Event
 
 
-class Drone(Observer):
-    def __init__(self, world: FieldGenerator, type, speed=2):
+class Drone(ABC):
+    def __init__(self, world: FieldGenerator, speed=2, color=(0, 0, 0)):
         self.area_x = world.i
         self.area_y = world.j
         self.speed = speed  # TODO to be used somewhere?
         self.position_x = 0
         self.position_y = 0
         self.field = world
-        self.type = type
         self.base_coordinates = [0, 0]
-        self.battery = 1000
-        if type == 'spray':
-            Observer.__init__(self)
-            self.observe('sick_plant', self.add_sick_plant)
-            self.observe('Charge finished', self.get_battery)
-            self.sick_plants = [[0 for c in range(world.i)] for r in range(world.j)]
-            self.sick_coordinate_list = []
-
-    def get_battery(self, battery):
-        self.battery = battery
-
-    def fly_direction(self):
-        if self.position_y % 2 == 0:
-            self.position_x += 1
-            if self.position_x > self.area_x:
-                self.position_x = self.area_x
-        if self.position_x == self.area_x:
-            self.position_y += 1
-        if self.position_y % 2 == 1:
-            self.position_x -= 1
-            if self.position_x < 0:
-                self.position_x = 0
-        if self.position_x == 0:
-            self.position_y += 1
-        if self.position_y >= self.area_y:
-            self.position_y = self.area_y
-
-    def scan_and_spray(self):
-        infection = self.field.obtain_crop_value(self.position_x, self.position_y)
-        # print('Scanning field - ' + str(infection))
-        if infection > 0.20:
-            Event('spray', [self.position_x, self.position_y])
-
-    def scan(self):
-        while True:
-            self.fly_direction()
-            # print("scan_x: " + str(self.position_x))
-            # print("scan_y: " + str(self.position_y))
-            if self.field.obtain_crop_value(self.position_x, self.position_y) > pest_threshold:
-                Event('sick_plant', [self.position_x, self.position_y])
-            time.sleep(0.2)
-
-    def spraying_routine(self):
-        while True:
-            if len(self.sick_coordinate_list) > 1:
-                self.go_and_spray()
-            time.sleep(0.2)
-
-    def go_and_spray(self):
-        print("Enough plants - let's spray!")
-        while len(self.sick_coordinate_list) > 0 and self.enough_charge():
-            self.goto_point(self.sick_coordinate_list.pop(0))
-        self.return_charger()
-
-    def return_charger(self):
-        i, j = self.base_coordinates
-        while ((self.position_x != i) or (self.position_y != j)):
-            if self.position_x < i:
-                self.position_x += 1
-                self.battery -= 1
-            elif self.position_x > i:
-                self.position_x -= 1
-                self.battery -= 1
-
-            if self.position_y < j:
-                self.position_y += 1
-                self.battery -= 1
-            elif self.position_y > j:
-                self.position_y -= 1
-                self.battery -= 1
-            time.sleep(0.2)
-        Event('need to charge', self.battery)
-
-    def goto_point(self, coordinates):
-        # Go to
-        # print("Going to point: ")
-        # print(coordinates)
-
-        i, j = coordinates
-        while ((self.position_x != i) or (self.position_y != j)) and self.enough_charge():
-            if self.position_x < i:
-                self.position_x += 1
-                self.battery -= 1
-            elif self.position_x > i:
-                self.position_x -= 1
-                self.battery -= 1
-
-            if self.position_y < j:
-                self.position_y += 1
-                self.battery -= 1
-            elif self.position_y > j:
-                self.position_y -= 1
-                self.battery -= 1
-            time.sleep(0.2)
-        if [self.position_x, self.position_y] == coordinates:
-            print("Position reached!")
-            print("Spraying...")
-            Event('spray', [self.position_x, self.position_y])
-        elif self.enough_charge() == False:
-            print("Not enough charge - returning to base")
-
-    def enough_charge(self):
-        # print("Battery status: ")
-        # print(self.battery)
-        if (self.battery > self.distance_to_base() + 5):
-            return True
-        else:
-            return False
+        self.battery = 500
+        self.battery_capacity = 500
+        self.is_charging = False
+        self.color = color
 
     def distance_to_base(self):
         dronePos = [self.position_x, self.position_y]
         distance = math.dist(dronePos, self.base_coordinates)
-        # print("Distance to base: ")
-        # print (distance)
         return distance
 
-    def add_sick_plant(self, coordinates):
-        i, j = coordinates
-        print('Sick crop received: {0}, {1}'.format(str(i), str(j)))
-        self.sick_plants[i][j] = 1
-        self.sick_coordinate_list.append(coordinates)
+    def enough_charge(self):
+        if self.battery <= self.distance_to_base() + 5:
+            return False
+        return True
+
+    def charge_drone(self):
+        i, j = self.base_coordinates
+        while (self.position_x != i) or (self.position_y != j):
+            if self.position_x < i:
+                self.position_x += 1
+                self.battery -= 1
+            elif self.position_x > i:
+                self.position_x -= 1
+                self.battery -= 1
+
+            if self.position_y < j:
+                self.position_y += 1
+                self.battery -= 1
+            elif self.position_y > j:
+                self.position_y -= 1
+                self.battery -= 1
+            time.sleep(0.2)
+        Event('charge', self)
 
     def render(self, display, camera_pos):
         x, y = camera_pos
-        if self.type == 'scan':
-            pygame.draw.circle(display, (0, 0, 255), (self.position_x * 6 + x, self.position_y * 6 + y), 8)
-        if self.type == 'spray':
-            pygame.draw.circle(display, (255, 0, 255), (self.position_x * 6 + x, self.position_y * 6 + y), 8)
+        pygame.draw.circle(display, self.color, (self.position_x * 6 + x, self.position_y * 6 + y), 8)
 
+    @abstractmethod
+    def drone_routine(self):
+        pass
+
+    @abstractmethod
     def run(self):
-        if self.type == 'scan':
-            t1 = threading.Thread(target=self.scan)
-            t1.start()
-        if self.type == 'spray':
-            t2 = threading.Thread(target=self.spraying_routine)
-            t2.start()
+        pass

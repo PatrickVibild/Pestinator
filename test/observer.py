@@ -3,7 +3,7 @@ class Observer:
     observers = []
 
     def __init__(self):
-        self.observers.append(self)
+        Observer.observers.append(self)
         self.observables = {}
 
     def observe(self, event_name, callback):

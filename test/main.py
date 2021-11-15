@@ -1,25 +1,25 @@
 import pygame
 from camera import Camera
 from fieldgenerator import FieldGenerator
-from drone import Drone
 from chargestation import ChargeStation
+from test.scanningdrone import ScanningDrone
+from test.spraydrone import SprayingDrone
 
 pygame.init()
 
 def Main(display, clock):
     field = FieldGenerator(150, 150, initial_infection=-0.2)
 
-    # charge station position
-    x, y, length, width = 1100, 1100, 200, 200
-    chargestation = ChargeStation(x, y, length, width)
+    charge_station = ChargeStation(capacity=2, charging_speed=5)
+    charge_station.run()
 
-    drone_scan = Drone(field, 'scan')
+    drone_scan = ScanningDrone(field)
     drone_scan.run()
 
-    drone_spray = Drone(field, 'spray')
+    drone_spray = SprayingDrone(field)
     drone_spray.run()
 
-    camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size )
+    camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size)
     field.run()
 
     while True:

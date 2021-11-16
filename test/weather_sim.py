@@ -1,9 +1,10 @@
 #%%import random
-import numpy as np #
-import pandas as pd
+import numpy as np 
 import csv
 import random
-
+from time import sleep
+import threading
+from event import Event
 
 #%%
 
@@ -119,6 +120,8 @@ class forecast:
         wind_direction = round(random.random(),2)*360
         return wind_speed, wind_direction
 
+    
+
     def predict(self, month, day, time):
         self.seed= self.load_seed()
         M = getattr(self.seed, self.month_dict[int(month)])
@@ -149,15 +152,48 @@ class forecast:
         if self.night:
             print("Night")
         else: print("Day")
+    
+    def correct_time(self,month, day, hour):
+        if hour > 24: 
+            day += 1
+            hour = hour - 24
+        if day > 31: 
+            month += 1
+            day = day - 31
+        if month > 12:
+            month = month - 12
+        return month, day, hour
+
+    def prediction_pipeline(self):
+        fc=forecast()
+        month = int(input("Starting month (number): "))
+        day = int(input("Starting day (number): "))
+        hour = float(input("Starting hour (number): "))
+        month,day,hour=fc.correct_time(month, day, hour)
+        inter = float(input("Simulation interval: "))
+        seed = fc.Seed()
+        count = 0
+        while count < 10:
+            fc.predict(month,day,hour)
+            fc.print_forecast()
+            Event('weather', fc)
+            hour += inter
+            month,day,hour=self.correct_time(month,day,hour)
+            count += 1
+            sleep(5)
+    def run(self):
+        tl = threading.Thread(target=self.prediction_pipeline)
+        tl.start()
 
 
 
-#%%
-if __name__ == '__main__':
-    fc=forecast()
-    # seed = fc.Seed()
-    month = float(input("Number of month"))
-    seed = fc.predict(6,3,8.5)
-    fc.print_forecast()
+
+# #%%
+# if __name__ == '__main__':
+#     fc=forecast()
+#     # seed = fc.Seed()
+#     month = float(input("Number of month"))
+#     seed = fc.predict(6,3,8.5)
+#     fc.print_forecast()
 
 # %%

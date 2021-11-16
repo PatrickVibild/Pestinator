@@ -2,13 +2,16 @@ import pygame
 from camera import Camera
 from fieldgenerator import FieldGenerator
 from chargestation import ChargeStation
-from test.scanningdrone import ScanningDrone
-from test.spraydrone import SprayingDrone
-
+from scanningdrone import ScanningDrone
+from spraydrone import SprayingDrone
+from weather_sim import forecast
 pygame.init()
 
 def Main(display, clock):
     field = FieldGenerator(150, 150, initial_infection=-0.2)
+
+    fc = forecast(6,4,10,0.5)
+    fc.run()
 
     charge_station = ChargeStation(capacity=2, charging_speed=5)
     charge_station.run()

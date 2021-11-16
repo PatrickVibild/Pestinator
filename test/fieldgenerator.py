@@ -22,7 +22,8 @@ def bound(value):
 class FieldGenerator(Observer):
     def __init__(self, i, j, initial_infection=0.0, detection_threshold=0.2):
         Observer.__init__(self)
-        self.observe('spray', self.cure) # Listening to events 'spray' and calling method cure if trigger
+        self.observe('spray', self.cure)# Listening to events 'spray' and calling method cure if trigger
+        self.observe('weather', self.weather_update) 
         self.detection_threshold = detection_threshold
         self.i = i
         self.j = j
@@ -80,4 +81,8 @@ class FieldGenerator(Observer):
         i, j = coordinates
         print('Cleaning crop{0}, {1}'.format(str(i), str(j)))
         self.change_crop_value(i, j, 0.0)
+    
+    def weather_update(self, w_data):
+        print('Updating weather, new temperature is:')
+        print(w_data.temperature)
 

@@ -5,6 +5,7 @@ import random
 from time import sleep
 import threading
 from event import Event
+import os
 
 #%%
 
@@ -36,7 +37,7 @@ class forecast:
                         12 : "december"
                     }
 
-    def __init__(self):
+    def __init__(self,month, day,hour,interval):
         self.wind_speed = 0
         self.wind_direction = 0
         self.rain_state = False
@@ -61,12 +62,17 @@ class forecast:
         self.past_night = False
 
         self.elapsed_time = 0
+        self.month = month
+        self.day = day
+        self.hour = hour
+        self.interval = interval
     def load_seed(self):
 
         rows = []
         seed = self.Seed()
         months_list = ["january","february","march","april","may","june","july","august","september","october","november","december"]
-        with open("cph.csv", 'r') as file:
+        os.system("pwd")
+        with open("test/cph.csv", 'r') as file:
             csvred = csv.reader(file)
             header = next(csvred)
             it = 0
@@ -165,12 +171,16 @@ class forecast:
         return month, day, hour
 
     def prediction_pipeline(self):
-        fc=forecast()
-        month = int(input("Starting month (number): "))
-        day = int(input("Starting day (number): "))
-        hour = float(input("Starting hour (number): "))
+        fc=forecast(self.month,self.day,self.hour,self.interval)
+        # month = int(input("Starting month (number): "))
+        month = self.month
+        # day = int(input("Starting day (number): "))
+        day = self.day
+        # hour = float(input("Starting hour (number): "))
+        hour = self.hour
         month,day,hour=fc.correct_time(month, day, hour)
-        inter = float(input("Simulation interval: "))
+        # inter = float(input("Simulation interval: "))
+        inter = self.interval
         seed = fc.Seed()
         count = 0
         while count < 10:

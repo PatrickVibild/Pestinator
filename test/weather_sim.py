@@ -178,17 +178,17 @@ class forecast:
         day = self.day
         # hour = float(input("Starting hour (number): "))
         hour = self.hour
-        month,day,hour=fc.correct_time(month, day, hour)
+        self.month,self.day,self.hour=fc.correct_time(self.month, self.day, self.hour)
         # inter = float(input("Simulation interval: "))
         inter = self.interval
         seed = fc.Seed()
         count = 0
-        while count < 10:
-            fc.predict(month,day,hour)
+        while True:
+            fc.predict(self.month,self.day,self.hour)
             fc.print_forecast()
             Event('weather', fc)
             hour += inter
-            month,day,hour=self.correct_time(month,day,hour)
+            self.month,self.day,self.hour=self.correct_time(self.month,self.day,self.hour)
             count += 1
             sleep(5)
     def run(self):

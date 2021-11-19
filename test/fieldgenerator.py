@@ -1,8 +1,10 @@
+import math
 import time
 
 import numpy
 import threading
 from observer import Observer
+from test.weather_sim import forecast
 
 
 def crop_color(infection: float):
@@ -20,14 +22,17 @@ def bound(value):
 
 
 class FieldGenerator(Observer):
+    weather = None
+
     def __init__(self, i, j, initial_infection=0.0, detection_threshold=0.2):
         Observer.__init__(self)
-        self.observe('spray', self.cure)# Listening to events 'spray' and calling method cure if trigger
-        self.observe('weather', self.weather_update) 
+        self.observe('spray', self.cure)  # Listening to events 'spray' and calling method cure if trigger
+        self.observe('weather', self.weather_update)
         self.detection_threshold = detection_threshold
         self.i = i
         self.j = j
-        self._field = [[bound(numpy.random.lognormal(0, 1) / 10 + initial_infection) for x in range(i)] for y in range(j)]
+        self._field = [[bound(numpy.random.lognormal(0, 1) / 10 + initial_infection) for x in range(i)] for y in
+                       range(j)]
         self._image = numpy.zeros((self.i * 6, self.j * 6, 3))
         for y in range(self.j):
             for x in range(self.i):
@@ -35,12 +40,13 @@ class FieldGenerator(Observer):
                 for n in range(6):
                     for m in range(6):
                         self._image[(x * 6) + n][(y * 6) + m] = cell_color
-        side_values = 0.06
+        side_values = 0.20
         self.kernel = [
-            [side_values, side_values   , side_values],
-            [side_values, 0.7          , side_values],
-            [side_values, side_values   , side_values]
+            [side_values, side_values, side_values],
+            [side_values, 0.7, side_values],
+            [side_values, side_values, side_values]
         ]
+
     def obtain_render_image(self):
         return self._image
 
@@ -58,20 +64,38 @@ class FieldGenerator(Observer):
                 self._image[(i * 6) + n][(j * 6) + m] = cell_color
 
     def infest(self):
+        # TODO protect the cell once its been clean.
         while True:
-            time.sleep(30)
+            time.sleep(1)
+            if self.weather is None:
+                continue
             copy_field = self._field
+            wind_kernel = self.direction_kernel()
             for x in range(len(copy_field)):
                 for y in range(len(copy_field[x])):
                     total = 0
-                    for m in range(len(self.kernel)):
-                        if x+m-1 < 0 or x+m-1 >= len(copy_field):
+                    for m in range(len(wind_kernel)):
+                        if x + m - 1 < 0 or x + m - 1 >= len(copy_field):  # -1 allows us to use only a 3x3 kernel
                             continue
-                        for n in range(len(self.kernel[m])):
-                            if y+n-1 < 0 or y+n-1 >= len(copy_field[x]):
+                        for n in range(len(wind_kernel[m])):
+                            if y + n - 1 < 0 or y + n - 1 >= len(copy_field[x]):
                                 continue
-                            total += copy_field[x+m-1][y+n-1] * self.kernel[m][n]
+                            total += copy_field[x + m - 1][y + n - 1] * wind_kernel[m][n]
                     self.change_crop_value(x, y, total)
+
+    def direction_kernel(self):
+        wind_kernel = numpy.zeros((len(self.kernel), len(self.kernel[0])))
+        direction = self.weather.wind_direction * math.pi / 180
+        wind_kernel[0][0] = max(self.kernel[0][0] * math.cos(direction)/2 + self.kernel[0][0] * (-1) * math.sin(direction)/2, 0)
+        wind_kernel[0][1] = max(self.kernel[0][1] * (-1) * math.sin(direction), 0)
+        wind_kernel[0][2] = max(self.kernel[0][2] * (-1) * math.cos(direction)/2 + self.kernel[0][2] * (-1) * math.sin(direction)/2, 0)
+        wind_kernel[1][0] = max(self.kernel[1][0] * math.cos(direction), 0)
+        wind_kernel[1][1] = self.kernel[1][1]
+        wind_kernel[1][2] = max(self.kernel[1][2] * (-1) * math.cos(direction), 0)
+        wind_kernel[2][0] = max(self.kernel[2][0] * math.cos(direction)/2 + self.kernel[2][0] * math.sin(direction)/2, 0)
+        wind_kernel[2][1] = max(self.kernel[2][1] * math.sin(direction), 0)
+        wind_kernel[2][2] = max(self.kernel[2][2] * (-1 ) * math.cos(direction)/2 + self.kernel[2][0] * math.sin(direction)/2, 0)
+        return wind_kernel
 
     def run(self):
         t1 = threading.Thread(target=self.infest)
@@ -81,8 +105,7 @@ class FieldGenerator(Observer):
         i, j = coordinates
         print('Cleaning crop{0}, {1}'.format(str(i), str(j)))
         self.change_crop_value(i, j, 0.0)
-    
-    def weather_update(self, w_data):
-        print('Updating weather, new temperature is:')
-        print(w_data.temperature)
 
+    def weather_update(self, w_data: forecast):
+        print('Field updated the weather')
+        self.weather = w_data

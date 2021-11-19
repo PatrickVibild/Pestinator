@@ -73,7 +73,7 @@ class forecast:
         seed = self.Seed()
         months_list = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october",
                        "november", "december"]
-        os.system("pwd")
+        #os.system("pwd")
         with open("cph.csv", 'r') as file:
             csvred = csv.reader(file)
             header = next(csvred)

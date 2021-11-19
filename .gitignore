@@ -12,3 +12,7 @@ test/__pycache__/event.cpython-310.pyc
 test/__pycache__/fieldgenerator.cpython-310.pyc
 test/__pycache__/observer.cpython-310.pyc
 test/__pycache__/chargestation.cpython-310.pyc
+test/__pycache__/__init__.cpython-310.pyc
+test/__pycache__/scanningdrone.cpython-310.pyc
+test/__pycache__/spraydrone.cpython-310.pyc
+test/__pycache__/weather_sim.cpython-310.pyc

@@ -8,7 +8,7 @@ from weather_sim import forecast
 pygame.init()
 
 def Main(display, clock):
-    field = FieldGenerator(150, 150, initial_infection=-2)
+    field = FieldGenerator(150, 150, initial_infection=-1)
 
     charge_station = ChargeStation(capacity=2, charging_speed=5)
     charge_station.run()
@@ -22,11 +22,11 @@ def Main(display, clock):
     camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size)
     field.run()
 
-    fc = forecast(6, 4, 10, 0.5)
+    fc = forecast(6, 4, 10, interval=0.5) # interval is every hours. in this case 0.5 is 30min.
     fc.run()
 
     while True:
-        clock.tick(30)
+        clock.tick(120)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()

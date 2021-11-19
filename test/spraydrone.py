@@ -53,7 +53,7 @@ class SprayingDrone(Observer, Drone):
             elif self.position_y > j:
                 self.position_y -= 1
                 self.battery -= 1
-            time.sleep(0.2)
+            time.sleep(0.01)
         if [self.position_x, self.position_y] == coordinates:
             Event('spray', [self.position_x, self.position_y])
         elif not self.enough_charge():

@@ -7,17 +7,28 @@ from spraydrone import SprayingDrone
 from weather_sim import forecast
 pygame.init()
 
+no_sprayingdrones = 3
+no_scanningdrones = 3
+
 def Main(display, clock):
     field = FieldGenerator(150, 150, initial_infection=-2)
 
     charge_station = ChargeStation(capacity=2, charging_speed=5)
     charge_station.run()
 
-    drone_scan = ScanningDrone(field)
-    drone_scan.run()
+    # drone_scan = ScanningDrone(field)
+    # drone_scan.run()
+    #
+    # drone_spray = SprayingDrone(field)
+    # drone_spray.run()
 
-    drone_spray = SprayingDrone(field)
-    drone_spray.run()
+    scanning_drones = [ScanningDrone(field) for i in range(no_scanningdrones)]
+    for drone_scan in scanning_drones:
+        drone_scan.run()
+
+    spraying_drones = [SprayingDrone(field) for i in range(no_sprayingdrones)]
+    for drone_spray in spraying_drones:
+        drone_spray.run()
 
     camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size)
     field.run()
@@ -37,8 +48,13 @@ def Main(display, clock):
         surface = pygame.surfarray.make_surface(field.obtain_render_image())
         # keeps the layer of the image. that is been render.
         display.blit(surface, camera_pos)
-        drone_scan.render(display, camera_pos)
-        drone_spray.render(display, camera_pos)
+
+        for drone_scan in scanning_drones:
+            drone_scan.render(display, camera_pos)
+
+        for drone_spray in spraying_drones:
+            drone_spray.render(display, camera_pos)
+
         pygame.display.flip()
 
 

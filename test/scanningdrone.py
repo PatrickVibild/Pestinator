@@ -55,7 +55,13 @@ class ScanningDrone(Drone, Observer):
             self.position_y = self.area_y
 
     def fast_brute_force_routine(self):
-        x, y = (0, random.randint(5, 20))
+        seed = random.randint(0, self.area_x + self.area_y)
+        if seed <= self.area_y:
+            x , y = (0, seed)
+        else:
+            x, y = (seed - self.area_y, 0)
+        self.exploring = True if random.randint(0, 1) == 0 else False
+
         while True:
             self.fly_to(x, y)
             x, y = swap(x, y)

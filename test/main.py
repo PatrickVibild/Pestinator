@@ -4,11 +4,16 @@ from fieldgenerator import FieldGenerator
 from chargestation import ChargeStation
 from scanningdrone import ScanningDrone
 from spraydrone import SprayingDrone
-from weather_sim import forecast
+from weather_sim import Forecast
+from data_acq import Data_visualizer
 pygame.init()
 
 def Main(display, clock):
-    field = FieldGenerator(150, 150, initial_infection=-2)
+    interval = 0.5
+    data = Data_visualizer(interval)
+    data.run()
+
+    field = FieldGenerator(150, 150, initial_infection=0)
 
     charge_station = ChargeStation(capacity=2, charging_speed=5)
     charge_station.run()
@@ -22,24 +27,29 @@ def Main(display, clock):
     camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size)
     field.run()
 
-    fc = forecast(6, 4, 10, 0.5)
+    fc = Forecast(6, 4, 10, interval)
     fc.run()
 
     while True:
-        clock.tick(30)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
+        try:
+            clock.tick(30)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
 
-        camera_pos = camera.move()
-        display.fill(colors["WHITE"])
-        surface = pygame.surfarray.make_surface(field.obtain_render_image())
-        # keeps the layer of the image. that is been render.
-        display.blit(surface, camera_pos)
-        drone_scan.render(display, camera_pos)
-        drone_spray.render(display, camera_pos)
-        pygame.display.flip()
+            camera_pos = camera.move()
+            display.fill(colors["WHITE"])
+            surface = pygame.surfarray.make_surface(field.obtain_render_image())
+            # keeps the layer of the image. that is been render.
+            display.blit(surface, camera_pos)
+            drone_scan.render(display, camera_pos)
+            drone_spray.render(display, camera_pos)
+            pygame.display.flip()
+        except KeyboardInterrupt:
+            data.plot_data()
+            exit()
+            
 
 
 if __name__ in "__main__":

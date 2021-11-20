@@ -2,10 +2,10 @@ import math
 import time
 
 import pygame
-from test.fieldgenerator import FieldGenerator
+from fieldgenerator import FieldGenerator
 from abc import ABC, abstractmethod
 
-from test.event import Event
+from event import Event
 
 
 class Drone(ABC):

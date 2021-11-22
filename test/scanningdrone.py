@@ -2,9 +2,9 @@ import random
 import threading
 import time
 
-from test.drone import Drone
-from test.event import Event
-from test.fieldgenerator import FieldGenerator
+from drone import Drone
+from event import Event
+from fieldgenerator import FieldGenerator
 from observer import Observer
 
 
@@ -25,10 +25,24 @@ class ScanningDrone(Drone, Observer):
         # TODO implement observers
         Drone.__init__(self, world, speed, color)
         self.exploring = True
+        self.spiral_count = 1
+        self.direction_count = 0
 
     def run(self):
         t1 = threading.Thread(target=self.fast_brute_force_routine)
         t1.start()
+
+    def move_right(self, i):
+        return self.position_x + i, self.position_y
+
+    def move_left(self, i):
+        return self.position_x - i, self.position_y
+
+    def move_up(self, i):
+        return self.position_x, self.position_y - i
+
+    def move_down(self, i):
+        return self.position_x, self.position_y + i
 
     def drone_routine(self):
         while True:
@@ -37,6 +51,29 @@ class ScanningDrone(Drone, Observer):
             if self.field.is_crop_infected(self.position_x, self.position_y):
                 Event('sick_plant', [self.position_x, self.position_y])
             time.sleep(0.001)
+
+    def scan_area(self):
+        self.spiral_count = 1
+        self.direction_count = 0
+        while self.field.is_crop_infected(self.position_x, self.position_y):
+            Event('sick_plant', [self.position_x, self.position_y])
+            print(self.move_right(self.spiral_count)[0])
+            if self.spiral_count % 2 == 1:
+                if self.direction_count == 0:
+                    self.fly_to(self.move_right(self.spiral_count)[0], self.move_right(self.spiral_count)[1])
+                    self.direction_count += 1
+                else:
+                    self.fly_to(self.move_down(self.spiral_count)[0], self.move_down(self.spiral_count)[1])
+                    self.spiral_count += 1
+                    self.direction_count += 1
+            else:
+                if self.direction_count == 0:
+                    self.fly_to(self.move_left(self.spiral_count)[0], self.move_left(self.spiral_count)[1])
+                    self.direction_count += 1
+                else:
+                    self.fly_to(self.move_up(self.spiral_count)[0], self.move_up(self.spiral_count)[1])
+                    self.spiral_count += 1
+                    self.direction_count += 1
 
     def flight_route(self):
         if self.position_y % 2 == 0:
@@ -111,4 +148,6 @@ class ScanningDrone(Drone, Observer):
 
     def scan_and_report(self):
         if self.field.is_crop_infected(self.position_x, self.position_y):
-            Event('sick_plant', [self.position_x, self.position_y])
+            # Each time we detect a infected crop we scan the area
+            self.scan_area()
+            # Event('sick_plant', [self.position_x, self.position_y])

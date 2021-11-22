@@ -8,7 +8,7 @@ from weather_sim import forecast
 pygame.init()
 
 no_sprayingdrones = 3
-no_scanningdrones = 3
+no_scanningdrones = 1
 
 def Main(display, clock):
     field = FieldGenerator(150, 150, initial_infection=-1)

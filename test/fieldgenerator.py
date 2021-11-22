@@ -4,7 +4,7 @@ import time
 import numpy
 import threading
 from observer import Observer
-from test.weather_sim import forecast
+from weather_sim import forecast
 
 
 def crop_color(infection: float):

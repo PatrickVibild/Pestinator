@@ -1,7 +1,7 @@
 import threading
 import time
 from observer import Observer
-from test.drone import Drone
+from drone import Drone
 
 
 class ChargeStation(Observer):

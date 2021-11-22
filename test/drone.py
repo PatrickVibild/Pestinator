@@ -10,8 +10,8 @@ from event import Event
 
 class Drone(ABC):
     def __init__(self, world: FieldGenerator, speed=2, color=(0, 0, 0)):
-        self.area_x = world.i
-        self.area_y = world.j
+        self.area_x = world.i - 1
+        self.area_y = world.j - 1
         self.speed = speed  # TODO to be used somewhere?
         self.position_x = 0
         self.position_y = 0
@@ -48,7 +48,7 @@ class Drone(ABC):
             elif self.position_y > j:
                 self.position_y -= 1
                 self.battery -= 1
-            time.sleep(0.2)
+            time.sleep(0.01)
         Event('charge', self)
 
     def render(self, display, camera_pos):

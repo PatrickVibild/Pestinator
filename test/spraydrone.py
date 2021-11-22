@@ -8,7 +8,9 @@ from observer import Observer
 
 
 class SprayingDrone(Observer, Drone):
+    sick_coordinate_list = []
     def __init__(self, world: FieldGenerator, speed=2, color=(127, 0, 255)):
+        self.sick_coordinate_list = SprayingDrone.sick_coordinate_list
         Observer.__init__(self)
         Drone.__init__(self, world, speed, color)
         self.observe('sick_plant', self.add_sick_plant)
@@ -27,9 +29,10 @@ class SprayingDrone(Observer, Drone):
 
     def add_sick_plant(self, coordinates):
         i, j = coordinates
-        print('Sick crop received: {0}, {1}'.format(str(i), str(j)))
         self.sick_plants[i][j] = 1
-        self.sick_coordinate_list.append(coordinates)
+        if coordinates not in self.sick_coordinate_list:
+            print('Sick crop received: {0}, {1}'.format(str(i), str(j)))
+            self.sick_coordinate_list.append(coordinates)
 
     def go_and_spray(self):
         while len(self.sick_coordinate_list) > 0 and self.enough_charge() and not self.is_charging:
@@ -53,7 +56,7 @@ class SprayingDrone(Observer, Drone):
             elif self.position_y > j:
                 self.position_y -= 1
                 self.battery -= 1
-            time.sleep(0.2)
+            time.sleep(0.01)
         if [self.position_x, self.position_y] == coordinates:
             Event('spray', [self.position_x, self.position_y])
         elif not self.enough_charge():

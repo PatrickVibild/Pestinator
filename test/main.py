@@ -5,10 +5,12 @@ from chargestation import ChargeStation
 from scanningdrone import ScanningDrone
 from spraydrone import SprayingDrone
 from weather_sim import forecast
+
 pygame.init()
 
 no_sprayingdrones = 3
 no_scanningdrones = 1
+
 
 def Main(display, clock):
     field = FieldGenerator(150, 150, initial_infection=-1)
@@ -22,7 +24,9 @@ def Main(display, clock):
     # drone_spray = SprayingDrone(field)
     # drone_spray.run()
 
-    scanning_drones = [ScanningDrone(field) for i in range(no_scanningdrones)]
+    fc = forecast(1, 4, 10, interval=0.5)  # interval is every hours. in this case 0.5 is 30min.
+
+    scanning_drones = [ScanningDrone(field, fc) for i in range(no_scanningdrones)]
     for drone_scan in scanning_drones:
         drone_scan.run()
 
@@ -33,7 +37,6 @@ def Main(display, clock):
     camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size)
     field.run()
 
-    fc = forecast(6, 4, 10, interval=0.5) # interval is every hours. in this case 0.5 is 30min.
     fc.run()
 
     while True:
@@ -69,7 +72,8 @@ if __name__ in "__main__":
     }
     global scroll_size
     scroll_size = {
-        "WIDTH": 150 * 6, # TODO - make this pixel multiplication constant in entire project. Been spread across multiple classes
+        "WIDTH": 150 * 6,
+        # TODO - make this pixel multiplication constant in entire project. Been spread across multiple classes
         "HEIGHT": 150 * 6
     }
     global screen_resolution

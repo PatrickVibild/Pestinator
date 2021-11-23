@@ -55,6 +55,7 @@ class FieldGenerator(Observer):
         return self._field[i][j]
 
     def is_crop_infected(self, i, j):
+
         if self._field[i][j] >= 0.95:
             return False
         return self._field[i][j] > self.detection_threshold

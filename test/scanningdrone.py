@@ -5,6 +5,7 @@ import time
 from drone import Drone
 from event import Event
 from fieldgenerator import FieldGenerator
+from weather_sim import forecast
 from observer import Observer
 
 
@@ -20,13 +21,20 @@ def bound(value, upper, lower):
 
 
 class ScanningDrone(Drone, Observer):
-    def __init__(self, world: FieldGenerator, speed=2, color=(0, 0, 255)):
+    def __init__(self, world: FieldGenerator, weather: forecast, speed=2, color=(0, 0, 255)):
         Observer.__init__(self)
         # TODO implement observers
-        Drone.__init__(self, world, speed, color)
+        Drone.__init__(self, world, weather, speed, color)
+        self.observe('weather', self.weather_update)
         self.exploring = True
         self.spiral_count = 1
         self.direction_count = 0
+        self.chance_crop = False
+        self.visibility_thresh = 50
+
+    def weather_update(self, wind_data: forecast):
+        print('Field updated the weather')
+        self.weather = wind_data
 
     def run(self):
         t1 = threading.Thread(target=self.fast_brute_force_routine)
@@ -94,20 +102,24 @@ class ScanningDrone(Drone, Observer):
     def fast_brute_force_routine(self):
         seed = random.randint(0, self.area_x + self.area_y)
         if seed <= self.area_y:
-            x , y = (0, seed)
+            x, y = (0, seed)
         else:
             x, y = (seed - self.area_y, 0)
         self.exploring = True if random.randint(0, 1) == 0 else False
 
         while True:
-            self.fly_to(x, y)
-            x, y = swap(x, y)
-            self.fly_to(x, y)
-            x, y = self.shift_position(x, y)
-            self.fly_to(x, y)
-            x, y = swap(x, y)
-            self.fly_to(x, y)
-            x, y = self.shift_position(x, y)
+            if self.weather.wind_speed <= self.wind_thresh:
+                self.fly_to(x, y)
+                x, y = swap(x, y)
+                self.fly_to(x, y)
+                x, y = self.shift_position(x, y)
+                self.fly_to(x, y)
+                x, y = swap(x, y)
+                self.fly_to(x, y)
+                x, y = self.shift_position(x, y)
+            else:
+                self.charge_drone()
+                print("The wind speed is too high, so drones are not able to fly")
 
     def shift_position(self, x, y):
         if y == self.area_y and x == self.area_x:
@@ -147,7 +159,18 @@ class ScanningDrone(Drone, Observer):
             time.sleep(0.01)
 
     def scan_and_report(self):
-        if self.field.is_crop_infected(self.position_x, self.position_y):
+        if self.chance_of_seeing_crop():
             # Each time we detect a infected crop we scan the area
             self.scan_area()
             # Event('sick_plant', [self.position_x, self.position_y])
+
+    def chance_of_seeing_crop(self):
+        # print("visibility Drone: " + str(self.weather.visibility))
+        if self.weather.visibility >= self.visibility_thresh:
+            self.chance_crop = self.field.is_crop_infected(self.position_x, self.position_y)
+        else:
+            self.chance_crop = self.probability(self.weather.visibility)
+        return self.chance_crop
+
+    def probability(self, chance):
+        return random.randint(0, 100) < chance

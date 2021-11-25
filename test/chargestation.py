@@ -39,17 +39,18 @@ class ChargeStation(Observer):
                     drone.battery += self.charging_speed
 
             for sprayingdrone in self.active_drones:
-                if sprayingdrone.battery >= sprayingdrone.battery_capacity:
-                    sprayingdrone.is_charging = False
-                else:
-                    sprayingdrone.battery += self.charging_speed
-                if sprayingdrone.tank >= sprayingdrone.tank_capacity:
-                    sprayingdrone.is_filling = False
-                else:
-                    sprayingdrone.tank += 20
-                if not sprayingdrone.is_filling and not sprayingdrone.is_charging:
-                    self.active_drones.remove(sprayingdrone)
-                    self.capacity -= 1
+                if hasattr(sprayingdrone,'tank'):
+                    if sprayingdrone.battery >= sprayingdrone.battery_capacity:
+                        sprayingdrone.is_charging = False
+                    else:
+                        sprayingdrone.battery += self.charging_speed
+                    if sprayingdrone.tank >= sprayingdrone.tank_capacity:
+                        sprayingdrone.is_filling = False
+                    else:
+                        sprayingdrone.tank += 20
+                    if not sprayingdrone.is_filling and not sprayingdrone.is_charging:
+                        self.active_drones.remove(sprayingdrone)
+                        self.capacity -= 1
 
     def run(self):
         t1 = threading.Thread(target=self.routine)

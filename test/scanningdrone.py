@@ -5,7 +5,7 @@ import time
 from drone import Drone
 from event import Event
 from fieldgenerator import FieldGenerator
-from weather_sim import forecast
+from weather_sim import Forecast
 from observer import Observer
 
 
@@ -21,7 +21,7 @@ def bound(value, upper, lower):
 
 
 class ScanningDrone(Drone, Observer):
-    def __init__(self, world: FieldGenerator, weather: forecast, speed=2, color=(0, 0, 255)):
+    def __init__(self, world: FieldGenerator, weather: Forecast, speed=2, color=(0, 0, 255)):
         Observer.__init__(self)
         # TODO implement observers
         Drone.__init__(self, world, weather, speed, color)
@@ -32,7 +32,7 @@ class ScanningDrone(Drone, Observer):
         self.chance_crop = False
         self.visibility_thresh = 50
 
-    def weather_update(self, wind_data: forecast):
+    def weather_update(self, wind_data: Forecast):
         print('Field updated the weather')
         self.weather = wind_data
 

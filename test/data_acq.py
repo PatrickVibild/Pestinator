@@ -13,14 +13,14 @@ class Data_visualizer(Observer):
         self.detections_cnt = 0
         Observer.__init__(self)
         self.spray_quantity = 0
-        self.spray_data = np.array([10])
+        self.spray_data = np.array([0])
         self.observe('spray', self.spray_callback)# Listening to events 'spray' and calling method cure if trigger
         self.observe('field_data', self.field_callback)
         self.observe('sick_plant', self.detection_callback)
         self.colormap = ["#c8c8c8", "#ff0000", "#ffa500", "#00ff00"]
         self.labels_field = ["Dead ", "Critical", "Infected", "Healthy"]
         
-    def spray_callback(self):
+    def spray_callback(self,data):
         self.spray_quantity += 1
 
     def detection_callback(self, pair):

@@ -1,5 +1,6 @@
 import time
 import numpy
+import math 
 import threading
 from observer import Observer
 from event import Event
@@ -97,6 +98,7 @@ class FieldGenerator(Observer):
             if self.weather is None:
                 continue
             copy_field = self._field
+            wind_kernel = self.direction_kernel()
             for x in range(len(copy_field)):
                 for y in range(len(copy_field[x])):
                     total = 0

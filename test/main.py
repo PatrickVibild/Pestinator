@@ -16,7 +16,7 @@ def Main(display, clock):
     data = Data_visualizer(interval)
     data.run()
 
-    field = FieldGenerator(150, 150, initial_infection=0)
+    field = FieldGenerator(150, 150, initial_infection=-0.5)
 
     charge_station = ChargeStation(capacity=2, charging_speed=5)
     charge_station.run()
@@ -27,7 +27,7 @@ def Main(display, clock):
     # drone_spray = SprayingDrone(field)
     # drone_spray.run()
 
-    fc = Forecast(6, 4, 10, interval)
+    fc = Forecast(2, 4, 14, interval)
 
     scanning_drones = [ScanningDrone(field, fc) for i in range(no_scanningdrones)]
     for drone_scan in scanning_drones:

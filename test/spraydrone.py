@@ -1,9 +1,9 @@
 import threading
 import time
 
-from test.drone import Drone
-from test.event import Event
-from test.fieldgenerator import FieldGenerator
+from drone import Drone
+from event import Event
+from fieldgenerator import FieldGenerator
 from observer import Observer
 
 

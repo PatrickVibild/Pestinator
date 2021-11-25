@@ -16,16 +16,10 @@ def Main(display, clock):
     data = Data_visualizer(interval)
     data.run()
 
-    field = FieldGenerator(150, 150, initial_infection=0)
+    field = FieldGenerator(150, 150, initial_infection=-.5)
 
     charge_station = ChargeStation(capacity=2, charging_speed=5)
     charge_station.run()
-
-    # drone_scan = ScanningDrone(field)
-    # drone_scan.run()
-    #
-    # drone_spray = SprayingDrone(field)
-    # drone_spray.run()
 
     fc = Forecast(6, 4, 10, interval)
 
@@ -78,7 +72,7 @@ if __name__ in "__main__":
     }
     global scroll_size
     scroll_size = {
-        "WIDTH": 150 * 6, # TODO - make this pixel multiplication constant in entire project. Been spread across multiple classes
+        "WIDTH": 150 * 6,
         "HEIGHT": 150 * 6
     }
     global screen_resolution

@@ -3,14 +3,14 @@ import time
 
 import pygame
 from fieldgenerator import FieldGenerator
-from weather_sim import forecast
+from weather_sim import Forecast
 from abc import ABC, abstractmethod
 
 from event import Event
 
 
 class Drone(ABC):
-    def __init__(self, world: FieldGenerator, weather: forecast, speed=2, color=(0, 0, 0)):
+    def __init__(self, world: FieldGenerator, weather: Forecast, speed=2, color=(0, 0, 0)):
         self.area_x = world.i - 1
         self.area_y = world.j - 1
         self.speed = speed  # TODO to be used somewhere?
@@ -51,7 +51,7 @@ class Drone(ABC):
             elif self.position_y > j:
                 self.position_y -= 1
                 self.battery -= 1
-            time.sleep(0.01)
+            time.sleep(0.05)
         Event('charge', self)
 
     def render(self, display, camera_pos):

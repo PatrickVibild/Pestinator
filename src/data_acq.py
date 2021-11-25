@@ -2,7 +2,6 @@ import threading
 from observer import Observer
 import matplotlib.pyplot as plt
 import numpy as np
-import time
 
 class Data_visualizer(Observer):
     def __init__(self, interval):
@@ -20,11 +19,11 @@ class Data_visualizer(Observer):
         self.colormap = ["#c8c8c8", "#ff0000", "#ffa500", "#00ff00"]
         self.labels_field = ["Dead ", "Critical", "Infected", "Healthy"]
         
-    def spray_callback(self):
+    def spray_callback(self, coordinates):
         self.spray_quantity += 1
 
     def detection_callback(self, pair):
-        if self.detections_cnt is 0:
+        if self.detections_cnt == 0:
             self.detections = np.array(pair)
             self.detections_cnt += 1
         elif not (pair==self.detections).all().any():

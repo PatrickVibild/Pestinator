@@ -5,20 +5,20 @@ from src.drone import Drone
 from src.event import Event
 from src.fieldgenerator import FieldGenerator
 from observer import Observer
+from spraying_organizer import Spraying_Organizer
 
 
 class SprayingDrone(Observer, Drone):
-    sick_coordinate_list = []
-    def __init__(self, world: FieldGenerator, speed=2, color=(127, 0, 255)):
-        self.sick_coordinate_list = SprayingDrone.sick_coordinate_list
+    def __init__(self, world: FieldGenerator, organizer: Spraying_Organizer, drone_number, speed=2, color=(127, 0, 255)):
+        self.sick_coordinate_list = organizer.sick_coordinate_list
         Observer.__init__(self)
         Drone.__init__(self, world, speed, color)
-        self.observe('sick_plant', self.add_sick_plant)
+    #    self.observe('sick_plant', self.add_sick_plant)
         self.sick_plants = [[0 for c in range(world.i)] for r in range(world.j)]
-        self.sick_coordinate_list = []
         self.tank = 200
         self.tank_capacity = 200
         self.is_filling = False
+        self.number = drone_number
 
     def run(self):
         t1 = threading.Thread(target=self.drone_routine)
@@ -85,6 +85,7 @@ class SprayingDrone(Observer, Drone):
                 self.battery -= 1
             time.sleep(0.01)
         if [self.position_x, self.position_y] == coordinates:
+            print ("Spraying drone: {0}".format(self.number))
             Event('spray', [self.position_x, self.position_y])
             self.tank -= 10
         elif not self.enough_charge():

@@ -19,19 +19,15 @@ class ChargeStation(Observer):
     def charge(self, drone: Drone):
         if len(self.active_drones) < self.capacity:
             drone.is_charging = True
-            self.capacity += 1
             self.active_drones.append(drone)
 
     def charge_and_fill(self, sprayingdrone: SprayingDrone):
         if len(self.active_drones) < self.capacity:
             sprayingdrone.is_charging = True
             sprayingdrone.is_filling = True
-            self.capacity += 1
             self.active_drones.append(sprayingdrone)
 
     def charge_routine(self):
-        scanning = (scanning for scanning in self.active_drones if isinstance(scanning, ScanningDrone))
-        spraying = (spray for spray in self.active_drones if isinstance(spray, SprayingDrone))
 
         while True:
             time.sleep(Chronos.charging_waiting())
@@ -40,7 +36,6 @@ class ChargeStation(Observer):
                     if scanning_drone.battery >= scanning_drone.battery_capacity:
                         scanning_drone.is_charging = False
                         self.active_drones.remove(scanning_drone)
-                        self.capacity -= 1
                     else:
                         scanning_drone.battery += self.charging_speed
 
@@ -50,7 +45,6 @@ class ChargeStation(Observer):
                             spraying_drone.tank >= spraying_drone.tank_capacity:
                         spraying_drone.is_charging = False
                         self.active_drones.remove(spraying_drone)
-                        self.capacity -= 1
 
                     if spraying_drone.battery < spraying_drone.battery_capacity:
                         spraying_drone.battery += self.charging_speed

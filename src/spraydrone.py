@@ -16,8 +16,8 @@ class SprayingDrone(Observer, Drone):
         Drone.__init__(self, world, speed, color)
     #    self.observe('sick_plant', self.add_sick_plant)
         self.sick_plants = [[0 for c in range(world.i)] for r in range(world.j)]
-        self.tank = 200
-        self.tank_capacity = 200
+        self.tank = 50
+        self.tank_capacity = 50
         self.number = drone_number
 
     def run(self):
@@ -87,7 +87,7 @@ class SprayingDrone(Observer, Drone):
         if [self.position_x, self.position_y] == coordinates:
             print ("Spraying drone: {0}".format(self.number))
             Event('spray', [self.position_x, self.position_y])
-            self.tank -= 10
+            self.tank -= 1
         elif not self.enough_charge():
             print("Not enough charge - returning to base")
         elif not self.enough_tank():

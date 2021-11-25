@@ -24,7 +24,7 @@ class Drone(ABC):
         self.is_charging = False
         self.color = color
         self.weather = weather
-        self.wind_thresh = 7.5
+        self.wind_thresh = 20
 
     def distance_to_base(self):
         dronePos = [self.position_x, self.position_y]

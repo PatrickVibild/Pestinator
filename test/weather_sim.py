@@ -74,7 +74,7 @@ class Forecast:
         months_list = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october",
                        "november", "december"]
         #os.system("pwd")
-        with open("cph.csv", 'r') as file:
+        with open("test/cph.csv", 'r') as file:
             csvred = csv.reader(file)
             header = next(csvred)
             it = 0

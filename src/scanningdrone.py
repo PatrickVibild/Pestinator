@@ -74,7 +74,7 @@ class ScanningDrone(Drone, Observer):
         self.exploring = True if random.randint(0, 1) == 0 else False
 
         while True:
-            if self.weather.wind_speed <= self.wind_thresh:
+            if self.weather.wind_speed <= self.wind_thresh and not self.weather.night:
                 self.fly_to(x, y)
                 x, y = swap(x, y)
                 self.fly_to(x, y)
@@ -104,6 +104,8 @@ class ScanningDrone(Drone, Observer):
 
     def fly_to(self, x, y):
         while (self.position_x != x) or (self.position_y != y):
+            if self.weather.wind_speed >= self.wind_thresh:
+                break
             self.forward(x, y)
             self.scan_and_report(x, y)
             time.sleep(0.05)

@@ -17,7 +17,6 @@ class SprayingDrone(Observer, Drone):
         self.sick_plants = [[0 for c in range(world.i)] for r in range(world.j)]
         self.tank = 200
         self.tank_capacity = 200
-        self.is_filling = False
         self.number = drone_number
 
     def run(self):
@@ -62,9 +61,9 @@ class SprayingDrone(Observer, Drone):
         Event('charge and fill', self)
 
     def go_and_spray(self):
-        while len(self.sick_coordinate_list) > 0 and self.enough_charge() and self.enough_tank() and not self.is_filling and not self.is_charging:
+        while len(self.sick_coordinate_list) > 0 and self.enough_charge() and self.enough_tank() and not self.is_charging:
             self.spray_crop(self.sick_coordinate_list.pop(0))
-        if not self.is_charging or not self.is_filling:
+        if not self.is_charging:
             self.charge_fill_drone()
 
     def spray_crop(self, coordinates):

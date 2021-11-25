@@ -4,6 +4,7 @@ from fieldgenerator import FieldGenerator
 from chargestation import ChargeStation
 from scanningdrone import ScanningDrone
 from spraydrone import SprayingDrone
+from WeatherDisplay import WeatherDisplay
 from weather_sim import Forecast
 from spraying_organizer import Spraying_Organizer
 
@@ -12,6 +13,7 @@ pygame.init()
 
 no_sprayingdrones = 3
 no_scanningdrones = 3
+
 
 def Main(display, clock):
     interval = 0.5
@@ -40,6 +42,7 @@ def Main(display, clock):
 
     fc.run()
 
+    weather_display = WeatherDisplay()
     while True:
         try:
             clock.tick(30)
@@ -49,7 +52,13 @@ def Main(display, clock):
                     return
 
             camera_pos = camera.move()
-            display.fill(colors["WHITE"])
+
+            if weather_display.wind:
+                background_color = colors["LIGHT_BLUE"] if weather_display.day_light else colors["DARK_BLUE"]
+            else:
+                background_color = colors["WHITE"] if weather_display.day_light else colors["BLACK"]
+            display.fill(background_color)
+
             surface = pygame.surfarray.make_surface(field.obtain_render_image())
             # keeps the layer of the image. that is been render.
             display.blit(surface, camera_pos)
@@ -71,7 +80,8 @@ if __name__ in "__main__":
         "WHITE": (255, 255, 255),
         "RED": (255, 0, 0),
         "GREEN": (0, 255, 0),
-        "BLUE": (0, 0, 255),
+        "LIGHT_BLUE": (173, 216, 230),
+        "DARK_BLUE": (0, 0, 139),
         "BLACK": (0, 0, 0)
     }
     global scroll_size

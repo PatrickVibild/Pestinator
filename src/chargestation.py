@@ -3,6 +3,7 @@ import time
 from observer import Observer
 from drone import Drone
 from spraydrone import SprayingDrone
+from scanningdrone import ScanningDrone
 
 
 class ChargeStation(Observer):
@@ -27,30 +28,33 @@ class ChargeStation(Observer):
             self.capacity += 1
             self.active_drones.append(sprayingdrone)
 
-    def routine(self):
+    def charge_routine(self):
+        scanning = (scanning for scanning in self.active_drones if isinstance(scanning, ScanningDrone))
+        spraying = (spray for spray in self.active_drones if isinstance(spray, SprayingDrone))
+
         while True:
             time.sleep(0.2)
-            for drone in self.active_drones:
-                if drone.battery >= drone.battery_capacity:
-                    drone.is_charging = False
-                    self.active_drones.remove(drone)
+            for scanning_drone in scanning:
+                if scanning_drone.battery >= scanning_drone.battery_capacity:
+                    scanning_drone.is_charging = False
+                    self.active_drones.remove(scanning_drone)
                     self.capacity -= 1
                 else:
-                    drone.battery += self.charging_speed
+                    scanning_drone.battery += self.charging_speed
 
-            for sprayingdrone in self.active_drones:
-                if sprayingdrone.battery >= sprayingdrone.battery_capacity:
-                    sprayingdrone.is_charging = False
-                else:
-                    sprayingdrone.battery += self.charging_speed
-                if sprayingdrone.tank >= sprayingdrone.tank_capacity:
-                    sprayingdrone.is_filling = False
-                else:
-                    sprayingdrone.tank += 20
-                if not sprayingdrone.is_filling and not sprayingdrone.is_charging:
-                    self.active_drones.remove(sprayingdrone)
+            for spraying_drone in spraying:
+                if spraying_drone.battery >= spraying_drone.battery_capacity and \
+                        spraying_drone.tank >= spraying_drone.tank_capacity:
+                    spraying_drone.is_charging = False
+                    self.active_drones.remove(spraying_drone)
                     self.capacity -= 1
+
+                if spraying_drone.battery < spraying_drone.battery_capacity:
+                    spraying_drone.battery += self.charging_speed
+
+                if spraying_drone.tank < spraying_drone.tank_capacity:
+                    spraying_drone.tank += 20
 
     def run(self):
-        t1 = threading.Thread(target=self.routine)
+        t1 = threading.Thread(target=self.charge_routine)
         t1.start()

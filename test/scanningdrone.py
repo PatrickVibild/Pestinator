@@ -106,9 +106,14 @@ class ScanningDrone(Drone, Observer):
         else:
             x, y = (seed - self.area_y, 0)
         self.exploring = True if random.randint(0, 1) == 0 else False
-
+        first_time = True
         while True:
-            if self.weather.wind_speed <= self.wind_thresh:
+            if self.weather.night or self.weather.visibility < 40:
+                self.charge_drone()
+                if first_time:
+                    print("Not enough visibility, going back to chargin station")
+                    first_time = False
+            elif self.weather.wind_speed <= self.wind_thresh:
                 self.fly_to(x, y)
                 x, y = swap(x, y)
                 self.fly_to(x, y)
@@ -117,9 +122,12 @@ class ScanningDrone(Drone, Observer):
                 x, y = swap(x, y)
                 self.fly_to(x, y)
                 x, y = self.shift_position(x, y)
+                first_time = True
             else:
                 self.charge_drone()
-                print("The wind speed is too high, so drones are not able to fly")
+                if first_time:
+                    print("The wind speed is too high, so drones are not able to fly")
+                    first_time = False
 
     def shift_position(self, x, y):
         if y == self.area_y and x == self.area_x:

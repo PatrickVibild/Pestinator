@@ -5,6 +5,7 @@ from chargestation import ChargeStation
 from scanningdrone import ScanningDrone
 from spraydrone import SprayingDrone
 from WeatherDisplay import WeatherDisplay
+from chronos import Chronos
 from weather_sim import Forecast
 from spraying_organizer import Spraying_Organizer
 
@@ -20,6 +21,7 @@ def Main(display, clock):
  #   data = Data_visualizer(interval)
  #   data.run()
 
+    general_time = Chronos()
     field = FieldGenerator(150, 150, initial_infection=-.5)
 
     charge_station = ChargeStation(capacity=2, charging_speed=5)
@@ -46,6 +48,7 @@ def Main(display, clock):
     while True:
         try:
             clock.tick(30)
+            general_time.get_input()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

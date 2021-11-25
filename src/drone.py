@@ -3,6 +3,7 @@ import time
 
 import pygame
 from fieldgenerator import FieldGenerator
+from chronos import Chronos
 from weather_sim import Forecast
 from abc import ABC, abstractmethod
 
@@ -23,7 +24,7 @@ class Drone(ABC):
         self.is_charging = False
         self.color = color
         self.weather = weather
-        self.wind_thresh = 5.0
+        self.wind_thresh = 7.5
 
     def distance_to_base(self):
         dronePos = [self.position_x, self.position_y]
@@ -51,7 +52,7 @@ class Drone(ABC):
             elif self.position_y > j:
                 self.position_y -= 1
                 self.battery -= 1
-            time.sleep(0.05)
+            time.sleep(Chronos.drone_waiting())
         Event('charge', self)
 
     def render(self, display, camera_pos):

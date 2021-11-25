@@ -2,11 +2,10 @@ import random
 import threading
 import time
 
-import numpy
-
 from drone import Drone
 from event import Event
 from fieldgenerator import FieldGenerator
+from chronos import Chronos
 from weather_sim import Forecast
 from observer import Observer
 
@@ -47,7 +46,7 @@ class ScanningDrone(Drone, Observer):
 
             if self.field.is_crop_infected(self.position_x, self.position_y):
                 Event('sick_plant', [self.position_x, self.position_y])
-            time.sleep(0.001)
+            time.sleep(Chronos.drone_waiting())
 
     def flight_route(self):
         if self.position_y % 2 == 0:
@@ -108,7 +107,7 @@ class ScanningDrone(Drone, Observer):
                 break
             self.forward(x, y)
             self.scan_and_report(x, y)
-            time.sleep(0.05)
+            time.sleep(Chronos.drone_waiting())
 
     def forward(self, x, y):
         if self.position_x < x:
@@ -146,9 +145,9 @@ class ScanningDrone(Drone, Observer):
                     if self.field.is_crop_infected(self.position_x, self.position_y):
                         infected = True
                         Event('sick_plant', [self.position_x, self.position_y])
-                    time.sleep(0.05)
+                    time.sleep(Chronos.drone_waiting())
 
-            #if infected:
+            # if infected:
             if radius < 4 and infected:
                 self.scan_area(x, y, direction_x, direction_y, radius + 1)
         else:
@@ -159,7 +158,7 @@ class ScanningDrone(Drone, Observer):
         times = 0
         while (self.position_x != x or self.position_y != y) and times <= radius:
             self.forward(x, y)
-            time.sleep(0.05)
+            time.sleep(Chronos.drone_waiting())
             times += 1
 
     def is_coordinate_in_area(self, x, y):

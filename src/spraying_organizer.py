@@ -1,8 +1,5 @@
-import threading
-import time
-
 from observer import Observer
-from src.fieldgenerator import FieldGenerator
+from fieldgenerator import FieldGenerator
 
 class Spraying_Organizer(Observer):
     def __init__(self, world: FieldGenerator):

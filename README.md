@@ -46,3 +46,7 @@ And then define the desired callback function weather_update.
 ```forecast.wind_speed```: type: float, default: 0 . Speed in m/s of the wind.
 
 
+### Times relationship within agents.
+
+Drones 1 cycle = 0.2
+Field 1 cycle = 30

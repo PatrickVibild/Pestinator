@@ -4,6 +4,7 @@ from event import Event
 import numpy
 import threading
 from observer import Observer
+from chronos import Chronos
 from weather_sim import Forecast
 
 
@@ -72,7 +73,7 @@ class FieldGenerator(Observer):
     def infest(self):
         # TODO protect the cell once its been clean.
         while True:
-            time.sleep(30)
+            time.sleep(Chronos.field_waiting())
             if self.weather is None:
                 continue
             copy_field = self._field

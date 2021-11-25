@@ -1,9 +1,10 @@
 import threading
 import time
 
-from src.drone import Drone
-from src.event import Event
-from src.fieldgenerator import FieldGenerator
+from chronos import Chronos
+from drone import Drone
+from event import Event
+from fieldgenerator import FieldGenerator
 from observer import Observer
 from spraying_organizer import Spraying_Organizer
 
@@ -27,7 +28,7 @@ class SprayingDrone(Observer, Drone):
         while True:
             if len(self.sick_coordinate_list) > 1:
                 self.go_and_spray()
-            time.sleep(0.2)
+            time.sleep(Chronos.drone_waiting())
 
     def enough_tank(self):
         if self.tank <= 20:
@@ -57,7 +58,7 @@ class SprayingDrone(Observer, Drone):
             elif self.position_y > j:
                 self.position_y -= 1
                 self.battery -= 1
-            time.sleep(0.01)
+            time.sleep(Chronos.drone_waiting())
         Event('charge and fill', self)
 
     def go_and_spray(self):
@@ -82,7 +83,7 @@ class SprayingDrone(Observer, Drone):
             elif self.position_y > j:
                 self.position_y -= 1
                 self.battery -= 1
-            time.sleep(0.01)
+            time.sleep(Chronos.drone_waiting())
         if [self.position_x, self.position_y] == coordinates:
             print ("Spraying drone: {0}".format(self.number))
             Event('spray', [self.position_x, self.position_y])

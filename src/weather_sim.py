@@ -1,16 +1,18 @@
 #%%
-import random
-import numpy as np 
+import numpy as np
 import csv
 import random
 from time import sleep
 import threading
 from event import Event
+from chronos import Chronos
 
 
 #%%
 
 #%%
+
+
 class Forecast:
     class Month:
         def __init__(self,h,r):
@@ -192,7 +194,7 @@ class Forecast:
             hour += inter
             self.month,self.day,self.hour=self.correct_time(self.month,self.day,self.hour)
             count += 1
-            sleep(5)
+            sleep(Chronos.weather_waiting())
     def run(self):
         tl = threading.Thread(target=self.prediction_pipeline)
         tl.start()

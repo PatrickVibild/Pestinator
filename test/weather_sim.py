@@ -89,6 +89,7 @@ class Forecast:
                 
     def is_it_night(self, month, time):
         M = getattr(self.seed, self.month_dict[int(month)])
+        print(time,M.Dawn,M.Sunset)
         if time > M.Dawn and time < M.Sunset:
             return False
         else: return True
@@ -96,7 +97,7 @@ class Forecast:
     def is_it_raining(self,month):
         M = getattr(self.seed, self.month_dict[int(month)])
         if self.__past_forecast:
-            return (0.5*self.__past_rain_mm +0.5*round(random.random(),2)) < M.RainDays/30
+            return 0.8*self.__past_rain_mm +0.2*round(random.random(),2) < M.RainDays/30
         else: return round(random.random(),2) < M.RainDays/30
     
     def get_cloud_coverage(self, month):
@@ -146,6 +147,34 @@ class Forecast:
             wind_direction = round(random.random(),2)*360
         return round(wind_speed,2), round(wind_direction,2)
 
+    def get_visibility(self):
+        max = 100
+        minim = 30
+        if self.rain_state:
+            max -= 10
+            if self.wind_speed > 5:
+                max = 60
+        elif self.cloud_coverage > 80:
+            max -= 5
+        else: minim = 50
+        if self.sun:
+            minim = 60
+            max = 100
+        if self.wind_speed > 3 and not self.rain_state:
+            minim += 30
+        if self.night:
+            max = 30
+            minim = 0
+        if not self.night and self.__past_night:
+            self.__past_visibility = 60
+        if self.__past_forecast:
+            vis = 0.5*self.__past_visibility + 0.5*random.randint(minim,max)
+        else: vis = random.randint(minim,max)
+        if vis > 100: vis = 100
+        elif vis < 0: vis = 0
+        
+        return round(vis,2)
+
     def update_past_forecast(self):
 
         self.__past_month = self.month
@@ -171,9 +200,13 @@ class Forecast:
         self.rain_state = self. is_it_raining(month)
         if self.rain_state:
             if self.__past_forecast:
-                self.rain_mm = round(0.6*self.__past_rain_mm + 0.4*random.choice((-1,1))*round(np.random.normal(M.RainAvg/(24*4),M.RainAvg/(24*20*4)),2),2)
-            else: 
-                self.rain_mm = round(np.random.normal(M.RainAvg/(24*4),M.RainAvg/(24*20*4)),2)
+                self.rain_mm = round(0.8*self.__past_rain_mm + 0.2*random.choice((-1,1))*round(np.random.normal(M.RainAvg,M.RainAvg/(3))*self.interval/12,2),2)
+                if self.rain_mm > 100: self.rain_mm = 100
+                elif self.rain_mm < 0: 
+                    self.rain_mm = 0
+                    self.rain_state = False
+            else:
+                self.rain_mm = round(np.random.normal(M.RainAvg,M.RainAvg/(3))*self.interval/12,2)
             self.cloud_coverage = 100.0
         else: 
             self.cloud_coverage = self.get_cloud_coverage(month)
@@ -182,12 +215,15 @@ class Forecast:
             self.sun = True
         self.temperature = self.get_temperature(month,time)
         [self.wind_speed,self.wind_direction] = self.get_wind(month)
-
+        self.visibility = self.get_visibility()
         if not self.__past_forecast:
             self.__past_forecast = True
 
 
     def print_forecast(self):
+        if self.night:
+            print("Night")
+        else: print("Day")
         print("Wind speed: ",self.wind_speed)
         print("Wind direction: ",self.wind_direction)
         print("Raining?: ",self.rain_state)
@@ -195,9 +231,7 @@ class Forecast:
         print("Temperature: ",self.temperature)
         print("Visibility: ",self.visibility)
         print("Cloud coverage: ",self.cloud_coverage)
-        if self.night:
-            print("Night")
-        else: print("Day")
+        
     
     def correct_time(self,month, day, hour):
         if hour > 24: 
@@ -227,7 +261,7 @@ class Forecast:
             fc.predict(self.month,self.day,self.hour)
             fc.print_forecast()
             Event('weather', fc)
-            hour += inter
+            self.hour += self.interval
             self.month,self.day,self.hour=self.correct_time(self.month,self.day,self.hour)
             count += 1
             sleep(5)

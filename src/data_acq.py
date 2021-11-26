@@ -2,6 +2,8 @@ import threading
 from observer import Observer
 import matplotlib.pyplot as plt
 import numpy as np
+from chronos import Chronos
+import time
 
 class Data_visualizer(Observer):
     def __init__(self, interval):
@@ -10,6 +12,7 @@ class Data_visualizer(Observer):
         self.detections = np.array([0,0])
         self.detections_data = np.array([0])
         self.detections_cnt = 0
+        self.detections_percentage = np.array([0])
         Observer.__init__(self)
         self.spray_quantity = 0
         self.spray_data = np.array([10])
@@ -37,8 +40,8 @@ class Data_visualizer(Observer):
         self.detections_data = np.vstack([self.detections_data, self.detections_cnt])
 
     def plot_data_field(self):
-        self.x_axis = np.arange(0,len(self.field_data)*self.interval,self.interval)
-        plt.stackplot(self.x_axis, self.field_data[:,3],self.field_data[:,2],self.field_data[:,1],self.field_data[:,0],colors=self.colormap, labels=self.labels_field)
+        x_axis = np.arange(0,len(self.field_data)*8,8)
+        plt.stackplot(x_axis, self.field_data[:,3],self.field_data[:,2],self.field_data[:,1],self.field_data[:,0],colors=self.colormap, labels=self.labels_field)
         plt.legend(loc='upper left')
         plt.title("Field crops' health evolution")
         plt.xlabel('Hours')
@@ -47,9 +50,8 @@ class Data_visualizer(Observer):
 
     def plot_data_spray(self):
         plt.clf()
-        if len(self.x_axis) < len(self.spray_data):
-            plt.plot(self.x_axis,self.spray_data[:-1])
-        else: plt.plot(self.x_axis,self.spray_data)
+        x_axis = np.arange(0,len(self.spray_data)*4,4)
+        plt.plot(x_axis,self.spray_data)
         plt.title("Spray usage")
         plt.xlabel('Hours')
         plt.ylabel('Spray actions')
@@ -57,10 +59,8 @@ class Data_visualizer(Observer):
 
     def plot_data_detection(self):
         plt.clf()
-        detections_percentage = np.divide(self.detections_data.transpose(),np.sum(self.field_data[:,1:4],axis=1)*(15*15))*100
-        if len(self.x_axis) < len(np.transpose(detections_percentage)):
-            plt.plot(self.x_axis,np.transpose(detections_percentage)[:-1])
-        else: plt.plot(self.x_axis,np.transpose(detections_percentage))
+        x_axis = np.arange(0,len(self.detections_percentage)*4,4)
+        plt.plot(x_axis,np.transpose(self.detections_percentage))
         plt.title("Scanning performance")
         plt.xlabel('Hours')
         plt.ylabel('Detected crops [%]')
@@ -72,11 +72,17 @@ class Data_visualizer(Observer):
         self.plot_data_spray()
         self.plot_data_detection()
         print("Plotting finished")
+
+    def update_data(self):
+        self.spray_data = np.vstack([self.spray_data, self.spray_quantity])
+        self.detections_data = np.vstack([self.detections_data, self.detections_cnt])
+        np.append(self.detections_percentage, np.divide(self.detections_data[-1].transpose(),np.sum(self.field_data[-1,1:4])*(15*15))*100)
     def data_plot_pipeline(self):
         
         while True:
             try:
-                pass
+                time.sleep(Chronos.data_waiting())
+                self.update_data()
             except KeyboardInterrupt:
                 self.plot_data()
 

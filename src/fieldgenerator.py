@@ -89,7 +89,8 @@ class FieldGenerator(Observer):
                                 continue
                             total += copy_field[x + m - 1][y + n - 1] * wind_kernel[m][n]
                     self.change_crop_value(x, y, total)
-
+                    self.stats(self._field[x][y])
+            self.publish_stats()
     def direction_kernel(self):
         wind_kernel = numpy.zeros((len(self.kernel), len(self.kernel[0])))
         direction = self.weather.wind_direction * math.pi / 180

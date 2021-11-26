@@ -10,7 +10,7 @@ from spraying_organizer import Spraying_Organizer
 
 
 class SprayingDrone(Observer, Drone):
-    def __init__(self, world: FieldGenerator, organizer: Spraying_Organizer, drone_number, speed=2, color=(127, 0, 255)):
+    def __init__(self, world: FieldGenerator, organizer: Spraying_Organizer, drone_number, grid=False, speed=2, color=(127, 0, 255)):
         self.sick_coordinate_list = organizer.sick_coordinate_list
         Observer.__init__(self)
         Drone.__init__(self, world, speed, color)
@@ -19,6 +19,7 @@ class SprayingDrone(Observer, Drone):
         self.tank = 50
         self.tank_capacity = 50
         self.number = drone_number
+        self.grid = grid
 
     def run(self):
         t1 = threading.Thread(target=self.drone_routine)
@@ -32,6 +33,7 @@ class SprayingDrone(Observer, Drone):
 
     def enough_tank(self):
         if self.tank <= 20:
+     #       print("Not enough tank - returning to base")
             return False
         return True
 
@@ -85,9 +87,54 @@ class SprayingDrone(Observer, Drone):
                 self.battery -= 1
             time.sleep(Chronos.drone_waiting())
         if [self.position_x, self.position_y] == coordinates:
-            print ("Spraying drone: {0}".format(self.number))
-            Event('spray', [self.position_x, self.position_y])
-            self.tank -= 1
+            if self.grid:
+                print("Spraying in a grid around {0}".format(coordinates))
+                if self.position_x != 0:
+                    self.position_x -= 1
+                if self.position_y != 0:
+                    self.position_y -= 1
+                for i in range(3):
+                    if self.position_x > self.area_x or self.position_x < 0:
+                        self.position_x = self.area_x
+                    if self.position_y > self.area_y or self.position_y < 0:
+                        self.position_y = self.area_y
+                    Event('spray', [self.position_x, self.position_y])
+                    self.tank -= 1
+                    if [self.position_x, self.position_y] in self.sick_coordinate_list:
+                        print("Removing coordinate from list...")
+                        self.sick_coordinate_list.remove([self.position_x, self.position_y])
+                    self.position_x += 1
+                self.position_y += 1
+                self.position_x -= 1
+                for i in range(3):
+                    if self.position_x > self.area_x or self.position_x < 0:
+                        self.position_x = self.area_x
+                    if self.position_y > self.area_y or self.position_y < 0:
+                        self.position_y = self.area_y
+                    Event('spray', [self.position_x, self.position_y])
+                    self.tank -= 1
+                    if [self.position_x, self.position_y] in self.sick_coordinate_list:
+                        print("Removing coordinate from list...")
+                        self.sick_coordinate_list.remove([self.position_x, self.position_y])
+                    self.position_x -= 1
+                self.position_y += 1
+                self.position_x += 1
+                for i in range(3):
+                    if self.position_x > self.area_x or self.position_x < 0:
+                        self.position_x = self.area_x
+                    if self.position_y > self.area_y or self.position_y < 0:
+                        self.position_y = self.area_y
+                    Event('spray', [self.position_x, self.position_y])
+                    self.tank -= 1
+                    if [self.position_x, self.position_y] in self.sick_coordinate_list:
+                        print("Removing coordinate from list...")
+                        self.sick_coordinate_list.remove([self.position_x, self.position_y])
+                    self.position_x += 1
+            else:
+                print("Spraying drone: {0}".format(self.number))
+                Event('spray', [self.position_x, self.position_y])
+                self.tank -= 1
+
         elif not self.enough_charge():
             print("Not enough charge - returning to base")
         elif not self.enough_tank():

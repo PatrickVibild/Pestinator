@@ -12,14 +12,14 @@ from spraying_organizer import Spraying_Organizer
 from data_acq import Data_visualizer
 pygame.init()
 
-no_sprayingdrones = 10
-no_scanningdrones = 5
+no_sprayingdrones = 5
+no_scanningdrones = 1
 
 
 def Main(display, clock):
     interval = 0.5
-    data = Data_visualizer(interval)
-    data.run()
+#    data = Data_visualizer(interval)
+#    data.run()
 
     general_time = Chronos()
     field = FieldGenerator(150, 150, initial_infection=-.5)
@@ -35,7 +35,7 @@ def Main(display, clock):
     for drone_scan in scanning_drones:
         drone_scan.run()
 
-    spraying_drones = [SprayingDrone(field,spraying_organizer,i) for i in range(no_sprayingdrones)]
+    spraying_drones = [SprayingDrone(field,spraying_organizer,i,grid=True) for i in range(no_sprayingdrones)]
     for drone_spray in spraying_drones:
         drone_spray.run()
 

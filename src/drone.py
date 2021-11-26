@@ -33,6 +33,7 @@ class Drone(ABC):
 
     def enough_charge(self):
         if self.battery <= self.distance_to_base() + 5:
+      #      print("Not enough battery - returning to base")
             return False
         return True
 

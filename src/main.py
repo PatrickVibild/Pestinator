@@ -13,13 +13,13 @@ from data_acq import Data_visualizer
 pygame.init()
 
 no_sprayingdrones = 5
-no_scanningdrones = 1
+no_scanningdrones = 10
 
 
 def Main(display, clock):
-    interval = 0.5
-#    data = Data_visualizer(interval)
-#    data.run()
+    interval = 1
+    data = Data_visualizer(interval)
+    data.run()
 
     general_time = Chronos()
     field = FieldGenerator(150, 150, initial_infection=-.5)

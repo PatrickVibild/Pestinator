@@ -8,8 +8,9 @@ import time
 class Data_visualizer(Observer):
     def __init__(self, interval):
         self.field_data = np.array([[100,0,0,0]])
+        self.instant_field_data = np.array([[225000,0,0,0]])
         self.interval = interval
-        self.detections = np.array([0,0])
+        self.detections = np.zeros((150,150))
         self.detections_data = np.array([0])
         self.detections_cnt = 0
         self.detections_percentage = np.array([0])
@@ -22,35 +23,32 @@ class Data_visualizer(Observer):
         self.colormap = ["#c8c8c8", "#ff0000", "#ffa500", "#00ff00"]
         self.labels_field = ["Dead ", "Critical", "Infected", "Healthy"]
         
-    def spray_callback(self, coordinates):
+    def spray_callback(self, pair):
         self.spray_quantity += 1
+        self.detections[pair[0],pair[1]] = 0
 
     def detection_callback(self, pair):
-        if self.detections_cnt == 0:
-            self.detections = np.array(pair)
-            self.detections_cnt += 1
-        elif not (pair==self.detections).all().any():
-            self.detections = np.vstack([self.detections, pair])
-            self.detections_cnt += 1
+        self.detections[pair[0],pair[1]] = 1
 
     def field_callback(self, data_list):
         np_data = np.array(data_list)/(15*15)
+        self.instant_field_data = np.array(data_list)
         self.field_data= np.vstack([self.field_data, np_data])
-        self.spray_data = np.vstack([self.spray_data, self.spray_quantity])
-        self.detections_data = np.vstack([self.detections_data, self.detections_cnt])
 
     def plot_data_field(self):
-        x_axis = np.arange(0,len(self.field_data)*8,8)
+        x_axis = np.arange(0,len(self.field_data)*8,step = 8)
         plt.stackplot(x_axis, self.field_data[:,3],self.field_data[:,2],self.field_data[:,1],self.field_data[:,0],colors=self.colormap, labels=self.labels_field)
         plt.legend(loc='upper left')
         plt.title("Field crops' health evolution")
         plt.xlabel('Hours')
         plt.ylabel('Crops [%]')
         plt.savefig('field_data.png')
+        plt.ylim(top = 20)
+        plt.savefig('field_data_closeup.png')
 
     def plot_data_spray(self):
         plt.clf()
-        x_axis = np.arange(0,len(self.spray_data)*4,4)
+        x_axis = np.arange(0,len(self.spray_data)*4,step = 4)
         plt.plot(x_axis,self.spray_data)
         plt.title("Spray usage")
         plt.xlabel('Hours')
@@ -59,8 +57,8 @@ class Data_visualizer(Observer):
 
     def plot_data_detection(self):
         plt.clf()
-        x_axis = np.arange(0,len(self.detections_percentage)*4,4)
-        plt.plot(x_axis,np.transpose(self.detections_percentage))
+        x_axis = np.arange(0,len(self.detections_data)*4,step = 4)
+        plt.plot(x_axis,self.detections_data)
         plt.title("Scanning performance")
         plt.xlabel('Hours')
         plt.ylabel('Detected crops [%]')
@@ -75,8 +73,8 @@ class Data_visualizer(Observer):
 
     def update_data(self):
         self.spray_data = np.vstack([self.spray_data, self.spray_quantity])
-        self.detections_data = np.vstack([self.detections_data, self.detections_cnt])
-        np.append(self.detections_percentage, np.divide(self.detections_data[-1].transpose(),np.sum(self.field_data[-1,1:4])*(15*15))*100)
+        self.detections_percentage = (np.sum(self.detections)/(np.sum(self.instant_field_data[1:4])))*100
+        self.detections_data = np.vstack([self.detections_data, self.detections_percentage])
     def data_plot_pipeline(self):
         
         while True:

@@ -12,8 +12,8 @@ from spraying_organizer import Spraying_Organizer
 from data_acq import Data_visualizer
 pygame.init()
 
-no_sprayingdrones = 10
-no_scanningdrones = 5
+no_sprayingdrones = 5
+no_scanningdrones = 10
 
 
 def Main(display, clock):

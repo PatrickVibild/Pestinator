@@ -50,7 +50,7 @@ class Data_visualizer(Observer):
 
     def plot_data_spray(self):
         plt.clf()
-        x_axis = np.arange(0,len(self.spray_data)*4,step = 4)
+        x_axis = np.arange(0,len(self.spray_data),step = 1)
         plt.plot(x_axis,self.spray_data)
         plt.title("Spray usage")
         plt.xlabel('Hours')
@@ -59,7 +59,7 @@ class Data_visualizer(Observer):
 
     def plot_data_detection(self):
         plt.clf()
-        x_axis = np.arange(0,len(self.detections_data)*4,step = 4)
+        x_axis = np.arange(0,len(self.detections_data),step = 1)
         plt.plot(x_axis,self.detections_data)
         plt.title("Scanning performance")
         plt.xlabel('Hours')
@@ -70,21 +70,27 @@ class Data_visualizer(Observer):
         plt.clf()
         plt.pcolormesh(self.spray_field, cmap = plt.cm.inferno)
         plt.colorbar()
+        bl_act = int(len(self.spray_data)/48)*225000
+        if bl_act == 0: percent = 0.
+        else: percent = 100-round((self.spray_quantity/bl_act)*100,2)
+        plt.xlabel(str(self.spray_data[-1])+' spray activations, '+str(percent)+'%% saved.')
         plt.savefig('spray_histogram.png')
 
     def plot_data(self):
-        print("Plotting...")
+        print("--------------------Plotting...-------------------")
         self.plot_data_field()
         self.plot_data_spray()
         self.plot_data_detection()
         self.plot_spray_histogram()
-        print("Plotting finished")
+        print("----------------Plotting finished-----------------")
 
     def update_data(self):
         self.spray_data = np.vstack([self.spray_data, self.spray_quantity])
         if np.sum(self.instant_field_data[1:4]) != 0:
             self.detections_percentage = (np.sum(self.detections)/(np.sum(self.instant_field_data[1:4])))*100
+        if self.detections_percentage > 100: self.detections_percentage = 100
         self.detections_data = np.vstack([self.detections_data, self.detections_percentage])
+
     def data_plot_pipeline(self):
         
         while True:

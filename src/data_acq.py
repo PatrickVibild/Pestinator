@@ -11,6 +11,7 @@ class Data_visualizer(Observer):
         self.instant_field_data = np.array([[225000,0,0,0]])
         self.interval = interval
         self.detections = np.zeros((150,150))
+        self.spray_field = np.zeros((150,150))
         self.detections_data = np.array([0])
         self.detections_cnt = 0
         self.detections_percentage = np.array([0])
@@ -26,6 +27,7 @@ class Data_visualizer(Observer):
     def spray_callback(self, pair):
         self.spray_quantity += 1
         self.detections[pair[0],pair[1]] = 0
+        self.spray_field[pair[0],pair[1]] += 1
 
     def detection_callback(self, pair):
         self.detections[pair[0],pair[1]] = 1
@@ -64,16 +66,24 @@ class Data_visualizer(Observer):
         plt.ylabel('Detected crops [%]')
         plt.savefig('detection_data.png')
 
+    def plot_spray_histogram(self):
+        plt.clf()
+        plt.pcolormesh(self.spray_field, cmap = plt.cm.inferno)
+        plt.colorbar()
+        plt.savefig('spray_histogram.png')
+
     def plot_data(self):
         print("Plotting...")
         self.plot_data_field()
         self.plot_data_spray()
         self.plot_data_detection()
+        self.plot_spray_histogram()
         print("Plotting finished")
 
     def update_data(self):
         self.spray_data = np.vstack([self.spray_data, self.spray_quantity])
-        self.detections_percentage = (np.sum(self.detections)/(np.sum(self.instant_field_data[1:4])))*100
+        if np.sum(self.instant_field_data[1:4]) != 0:
+            self.detections_percentage = (np.sum(self.detections)/(np.sum(self.instant_field_data[1:4])))*100
         self.detections_data = np.vstack([self.detections_data, self.detections_percentage])
     def data_plot_pipeline(self):
         

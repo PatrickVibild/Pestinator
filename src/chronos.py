@@ -8,9 +8,9 @@ def bound(value, min_v, max_v):
 class Chronos:
     time = 1
     drone_cycle = 0.2
-    field_cycle = 60
-    weather_cycle = 10
-    charging_cycle = 0.2
+    field_cycle = 180
+    weather_cycle = 90
+    charging_cycle = 0.5
 
     def __init__(self):
         self.max_time = 20

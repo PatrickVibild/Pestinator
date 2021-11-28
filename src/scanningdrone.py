@@ -6,6 +6,7 @@ from drone import Drone
 from event import Event
 from fieldgenerator import FieldGenerator
 from chronos import Chronos
+from scanning_map import ScanningMap
 from weather_sim import Forecast
 from observer import Observer
 
@@ -22,7 +23,8 @@ def bound(value, upper, lower):
 
 
 class ScanningDrone(Drone, Observer):
-    def __init__(self, world: FieldGenerator, weather: Forecast, speed=2, color=(0, 0, 255)):
+    def __init__(self, world: FieldGenerator, weather: Forecast, routine: str, scanning_map: ScanningMap, speed=2,
+                 color=(0, 0, 255)):
         Observer.__init__(self)
         # TODO implement observers
         Drone.__init__(self, world, weather, speed, color)
@@ -31,16 +33,43 @@ class ScanningDrone(Drone, Observer):
         self.spiral_count = 1
         self.direction_count = 0
         self.visibility_thresh = 50
+        self.routine = routine
+        self.scanning_map = scanning_map
 
     def weather_update(self, wind_data: Forecast):
         print('Field updated the weather')
         self.weather = wind_data
 
     def run(self):
-        t1 = threading.Thread(target=self.fast_brute_force_routine)
+        # drone_routine, fast_brute_force_routine
+        if self.routine == 'brute_force':
+            t1 = threading.Thread(target=self.drone_routine)
+        if self.routine == 'fast_brute_force':
+            t1 = threading.Thread(target=self.fast_brute_force_routine)
+        if self.routine == 'random':
+            t1 = threading.Thread(target=self.random_routine)
         t1.start()
 
+    def random_routine(self):
+        while True:
+            self.fly_random()
+
+    def fly_random(self):
+        if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh:
+            self.charge_drone()
+        else:
+            x, y = self.scanning_map.obtain_new_direction(self.position_x, self.position_y)
+            while self.position_x != x and self.position_y != y:
+                self.forward(x, y)
+                self.scan_and_report(x, y)
+                time.sleep(Chronos.drone_waiting())
+
     def drone_routine(self):
+        x = random.randint(0, self.area_x)
+        y = random.randint(0, self.area_y)
+        while self.position_x != x and self.position_y != y:
+            self.forward(x, y)
+            time.sleep(Chronos.drone_waiting())
         while True:
             self.flight_route()
 
@@ -49,20 +78,41 @@ class ScanningDrone(Drone, Observer):
             time.sleep(Chronos.drone_waiting())
 
     def flight_route(self):
-        if self.position_y % 2 == 0:
-            self.position_x += 1
-            if self.position_x > self.area_x:
-                self.position_x = self.area_x
-        if self.position_x == self.area_x:
-            self.position_y += 1
-        if self.position_y % 2 == 1:
-            self.position_x -= 1
-            if self.position_x < 0:
-                self.position_x = 0
-        if self.position_x == 0:
-            self.position_y += 1
-        if self.position_y >= self.area_y:
-            self.position_y = self.area_y
+        if self.is_charging:
+            pass
+        if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh:
+            self.charge_drone()
+            while self.is_charging:
+                pass
+            x = random.randint(0, self.area_x)
+            y = random.randint(0, self.area_y)
+            while self.position_x != x and self.position_y != y:
+                self.forward(x, y)
+                time.sleep(Chronos.drone_waiting())
+        else:
+            if self.position_y % 2 == 0:
+                self.position_x += 1
+                self.battery -= 1
+                if self.position_x > self.area_x:
+                    self.position_x = self.area_x
+            if self.position_x == self.area_x:
+                self.position_y += 1
+                self.battery -= 1
+            if self.position_y % 2 == 1:
+                self.position_x -= 1
+                self.battery -= 1
+                if self.position_x < 0:
+                    self.position_x = 0
+            if self.position_x == 0:
+                self.position_y += 1
+                self.battery -= 1
+            if self.position_y >= self.area_y:
+                self.position_y = self.area_y
+            if (self.position_y == self.area_y and self.position_x == self.area_x) or \
+                    (self.position_y == self.area_y and self.position_x == 0):
+                while self.position_x != 0 or self.position_y != 0:
+                    time.sleep(Chronos.drone_waiting())
+                    self.forward(0, 0)
 
     def fast_brute_force_routine(self):
         seed = random.randint(0, self.area_x + self.area_y)
@@ -73,17 +123,17 @@ class ScanningDrone(Drone, Observer):
         self.exploring = True if random.randint(0, 1) == 0 else False
 
         while True:
-            if self.weather.wind_speed <= self.wind_thresh and not self.weather.night:
-                self.fly_to(x, y)
-                x, y = swap(x, y)
-                self.fly_to(x, y)
-                x, y = self.shift_position(x, y)
-                self.fly_to(x, y)
-                x, y = swap(x, y)
-                self.fly_to(x, y)
-                x, y = self.shift_position(x, y)
-            else:
+            if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh:
                 self.charge_drone()
+            else:
+                self.fly_to(x, y)
+                x, y = swap(x, y)
+                self.fly_to(x, y)
+                x, y = self.shift_position(x, y)
+                self.fly_to(x, y)
+                x, y = swap(x, y)
+                self.fly_to(x, y)
+                x, y = self.shift_position(x, y)
 
     def shift_position(self, x, y):
         if y == self.area_y and x == self.area_x:
@@ -148,7 +198,7 @@ class ScanningDrone(Drone, Observer):
                     time.sleep(Chronos.drone_waiting())
 
             # if infected:
-            if radius < 4 and infected:
+            if radius < 10 and infected:
                 self.scan_area(x, y, direction_x, direction_y, radius + 1)
         else:
             if self.field.is_crop_infected(self.position_x, self.position_y):
@@ -168,8 +218,22 @@ class ScanningDrone(Drone, Observer):
         if self.weather.visibility >= self.visibility_thresh:
             return self.field.is_crop_infected(self.position_x, self.position_y)
         return False
-        # return self.probability(self.weather.visibility)
-        # do we need to implement this proability? This should give false positives, not false negatives.
 
-    # def probability(self, chance):
-    #    return random.randint(0, 100) < chance
+    def charge_fill_drone(self):
+        i, j = self.base_coordinates
+        while (self.position_x != i) or (self.position_y != j):
+            if self.position_x < i:
+                self.position_x += 1
+                self.battery -= 1
+            elif self.position_x > i:
+                self.position_x -= 1
+                self.battery -= 1
+
+            if self.position_y < j:
+                self.position_y += 1
+                self.battery -= 1
+            elif self.position_y > j:
+                self.position_y -= 1
+                self.battery -= 1
+            time.sleep(Chronos.drone_waiting())
+        Event('charge and fill', self)

@@ -13,6 +13,6 @@ class WeatherDisplay(Observer):
     def weather_update(self, w_data: Forecast):
         print('Field updated the weather')
         self.weather = w_data
-        self.wind = self.weather.wind_speed >= 20
+        self.wind = self.weather.wind_speed >= 8
         self.day_light = not self.weather.night
 

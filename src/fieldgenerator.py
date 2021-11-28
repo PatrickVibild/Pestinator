@@ -25,7 +25,7 @@ def bound(value):
 class FieldGenerator(Observer):
     weather = None
 
-    def __init__(self, i, j, initial_infection=0.0, detection_threshold=0.2):
+    def __init__(self, i, j, initial_infection=0.0, detection_threshold=0.2, spread_times=5):
         Observer.__init__(self)
         self.observe('spray', self.cure)  # Listening to events 'spray' and calling method cure if trigger
         self.observe('weather', self.weather_update)
@@ -52,6 +52,7 @@ class FieldGenerator(Observer):
             [side_values, 0.7, side_values],
             [side_values, side_values, side_values]
         ]
+        self.spread_times = spread_times
         self.publish_stats()
 
     def obtain_render_image(self):
@@ -61,9 +62,11 @@ class FieldGenerator(Observer):
         return self._field[i][j]
 
     def is_crop_infected(self, i, j):
-        return self._field[i][j] > self.detection_threshold
+        return 0.95 > self._field[i][j] > self.detection_threshold
 
     def change_crop_value(self, i, j, value):
+        if self._field[i][j] >= 0.95:
+            return
         self._field[i][j] = value
         cell_color = crop_color(value)
         for n in range(6):
@@ -71,9 +74,14 @@ class FieldGenerator(Observer):
                 self._image[(i * 6) + n][(j * 6) + m] = cell_color
 
     def infest(self):
-        # TODO protect the cell once its been clean.
+        spread = 0
+        time.sleep(5)
         while True:
-            time.sleep(Chronos.field_waiting())
+            if spread < self.spread_times:
+                spread += 1
+                print(spread)
+            else:
+                time.sleep(Chronos.field_waiting())
             if self.weather is None:
                 continue
             copy_field = self._field

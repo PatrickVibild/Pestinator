@@ -97,7 +97,8 @@ class FieldGenerator(Observer):
                                 continue
                             total += copy_field[x + m - 1][y + n - 1] * wind_kernel[m][n]
                     self.change_crop_value(x, y, total)
-
+                    self.stats(self._field[x][y])
+            self.publish_stats()
     def direction_kernel(self):
         wind_kernel = numpy.zeros((len(self.kernel), len(self.kernel[0])))
         direction = self.weather.wind_direction * math.pi / 180
@@ -122,11 +123,11 @@ class FieldGenerator(Observer):
 
     def cure(self, coordinates):
         i, j = coordinates
-        print('Cleaning crop{0}, {1}'.format(str(i), str(j)))
+        # print('Cleaning crop{0}, {1}'.format(str(i), str(j)))
         self.change_crop_value(i, j, 0.0)
 
     def weather_update(self, w_data: Forecast):
-        print('Field updated the weather')
+        # print('Field updated the weather')
         self.weather = w_data
 
     def stats(self, infection):

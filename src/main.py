@@ -12,8 +12,8 @@ from spraying_organizer import Spraying_Organizer
 from data_acq import Data_visualizer
 pygame.init()
 
-no_sprayingdrones = 5
-no_scanningdrones = 10
+no_sprayingdrones = 3
+no_scanningdrones = 3
 
 
 def Main(display, clock):
@@ -22,7 +22,7 @@ def Main(display, clock):
     data.run()
 
     general_time = Chronos()
-    field = FieldGenerator(150, 150, initial_infection=-.5)
+    field = FieldGenerator(150, 150, initial_infection=-0.5)
 
     charge_station = ChargeStation(capacity=10, charging_speed=5)
     charge_station.run()

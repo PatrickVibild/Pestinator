@@ -258,7 +258,7 @@ class Forecast:
         count = 0
         while True:
             fc.predict(self.month,self.day,self.hour)
-            fc.print_forecast()
+            #fc.print_forecast()
             Event('weather', fc)
             self.hour += self.interval
             self.month,self.day,self.hour=self.correct_time(self.month,self.day,self.hour)

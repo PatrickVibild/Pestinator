@@ -19,8 +19,8 @@ class Drone(ABC):
         self.position_y = 0
         self.field = world
         self.base_coordinates = [0, 0]
-        self.battery = 500
-        self.battery_capacity = 500
+        self.battery = 5000
+        self.battery_capacity = 5000
         self.is_charging = False
         self.color = color
         self.weather = weather

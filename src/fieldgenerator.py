@@ -115,11 +115,11 @@ class FieldGenerator(Observer):
 
     def cure(self, coordinates):
         i, j = coordinates
-        print('Cleaning crop{0}, {1}'.format(str(i), str(j)))
+        # print('Cleaning crop{0}, {1}'.format(str(i), str(j)))
         self.change_crop_value(i, j, 0.0)
 
     def weather_update(self, w_data: Forecast):
-        print('Field updated the weather')
+        # print('Field updated the weather')
         self.weather = w_data
 
     def stats(self, infection):

@@ -16,8 +16,8 @@ class SprayingDrone(Observer, Drone):
         Drone.__init__(self, world, speed, color)
     #    self.observe('sick_plant', self.add_sick_plant)
         self.sick_plants = [[0 for c in range(world.i)] for r in range(world.j)]
-        self.tank = 50
-        self.tank_capacity = 50
+        self.tank = 2000
+        self.tank_capacity = 2000
         self.number = drone_number
         self.grid = grid
 
@@ -41,7 +41,7 @@ class SprayingDrone(Observer, Drone):
         i, j = coordinates
         self.sick_plants[i][j] = 1
         if coordinates not in self.sick_coordinate_list:
-            print('Sick crop received: {0}, {1}'.format(str(i), str(j)))
+            # print('Sick crop received: {0}, {1}'.format(str(i), str(j)))
             self.sick_coordinate_list.append(coordinates)
 
     def charge_fill_drone(self):
@@ -88,7 +88,7 @@ class SprayingDrone(Observer, Drone):
             time.sleep(Chronos.drone_waiting())
         if [self.position_x, self.position_y] == coordinates:
             if self.grid:
-                print("Spraying in a grid around {0}".format(coordinates))
+                # print("Spraying in a grid around {0}".format(coordinates))
                 if self.position_x != 0:
                     self.position_x -= 1
                 if self.position_y != 0:
@@ -101,8 +101,12 @@ class SprayingDrone(Observer, Drone):
                     Event('spray', [self.position_x, self.position_y])
                     self.tank -= 1
                     if [self.position_x, self.position_y] in self.sick_coordinate_list:
-                        print("Removing coordinate from list...")
-                        self.sick_coordinate_list.remove([self.position_x, self.position_y])
+                        # print("Removing coordinate from list...")
+                        try:
+                            self.sick_coordinate_list.remove([self.position_x, self.position_y])
+                        except:
+                            if [self.position_x, self.position_y] in self.sick_coordinate_list:
+                                self.sick_coordinate_list.remove([self.position_x, self.position_y])
                     self.position_x += 1
                 self.position_y += 1
                 self.position_x -= 1
@@ -114,8 +118,11 @@ class SprayingDrone(Observer, Drone):
                     Event('spray', [self.position_x, self.position_y])
                     self.tank -= 1
                     if [self.position_x, self.position_y] in self.sick_coordinate_list:
-                        print("Removing coordinate from list...")
-                        self.sick_coordinate_list.remove([self.position_x, self.position_y])
+                        # print("Removing coordinate from list...")
+                        try:
+                            self.sick_coordinate_list.remove([self.position_x, self.position_y])
+                        except :
+                            pass
                     self.position_x -= 1
                 self.position_y += 1
                 self.position_x += 1
@@ -127,11 +134,14 @@ class SprayingDrone(Observer, Drone):
                     Event('spray', [self.position_x, self.position_y])
                     self.tank -= 1
                     if [self.position_x, self.position_y] in self.sick_coordinate_list:
-                        print("Removing coordinate from list...")
-                        self.sick_coordinate_list.remove([self.position_x, self.position_y])
+                        # print("Removing coordinate from list...")
+                        try:
+                            self.sick_coordinate_list.remove([self.position_x, self.position_y])
+                        except :
+                            pass
                     self.position_x += 1
             else:
-                print("Spraying drone: {0}".format(self.number))
+                # print("Spraying drone: {0}".format(self.number))
                 Event('spray', [self.position_x, self.position_y])
                 self.tank -= 1
 

@@ -70,7 +70,7 @@ class Data_visualizer(Observer):
         plt.clf()
         plt.pcolormesh(self.spray_field, cmap = plt.cm.inferno)
         plt.colorbar()
-        bl_act = int(len(self.spray_data)/48)*225000
+        bl_act = int(len(self.spray_data)/120)*225000
         if bl_act == 0: percent = 0.
         else: percent = 100-round((self.spray_quantity/bl_act)*100,2)
         plt.xlabel(str(self.spray_data[-1])+' spray activations, '+str(percent)+'%% saved.')

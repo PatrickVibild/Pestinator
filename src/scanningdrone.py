@@ -33,7 +33,7 @@ class ScanningDrone(Drone, Observer):
         self.visibility_thresh = 50
 
     def weather_update(self, wind_data: Forecast):
-        print('Field updated the weather')
+        # print('Scanning drone updated the weather')
         self.weather = wind_data
 
     def run(self):
@@ -122,6 +122,9 @@ class ScanningDrone(Drone, Observer):
         elif self.position_y > y:
             self.position_y -= 1
             self.battery -= 1
+        if not self.enough_charge():
+            print("Spraying drone: not enough battery")
+            self.charge_drone()
         self.position_x = bound(self.position_x, self.area_x, 0)
         self.position_y = bound(self.position_y, self.area_y, 0)
 
@@ -148,7 +151,7 @@ class ScanningDrone(Drone, Observer):
                     time.sleep(Chronos.drone_waiting())
 
             # if infected:
-            if radius < 4 and infected:
+            if radius < 1 and infected:
                 self.scan_area(x, y, direction_x, direction_y, radius + 1)
         else:
             if self.field.is_crop_infected(self.position_x, self.position_y):

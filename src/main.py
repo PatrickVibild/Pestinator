@@ -21,7 +21,7 @@ no_scanningdrones = 3
 
 
 def Main(display, clock):
-    interval = 0.5
+    interval = 1
     data = Data_visualizer(interval)
     data.run()
 

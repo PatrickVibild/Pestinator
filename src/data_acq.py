@@ -76,7 +76,7 @@ class Data_visualizer(Observer):
         bl_act = int((self.spray_quantity/168)*22500)
         if bl_act == 0: percent = 0.
         else: percent = 100-round((self.spray_quantity/bl_act)*100,2)
-        plt.xlabel(str(self.spray_data[-1])+' spray activations, '+str(percent)+'%% saved.')
+        # plt.xlabel(str(self.spray_data[-1])+' spray activations, '+str(percent)+'%% saved.')
         plt.savefig('spray_histogram.png')
 
     def plot_data(self):

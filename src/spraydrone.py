@@ -16,8 +16,8 @@ class SprayingDrone(Observer, Drone):
         Drone.__init__(self, world, speed, color)
     #    self.observe('sick_plant', self.add_sick_plant)
         self.sick_plants = [[0 for c in range(world.i)] for r in range(world.j)]
-        self.tank = 50
-        self.tank_capacity = 50
+        self.tank = 500
+        self.tank_capacity = 500
         self.number = drone_number
         self.grid = grid
 

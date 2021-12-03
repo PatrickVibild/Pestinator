@@ -16,7 +16,7 @@ from data_acq import Data_visualizer
 
 pygame.init()
 
-no_sprayingdrones = 5
+no_sprayingdrones = 3
 no_scanningdrones = 3
 
 
@@ -28,7 +28,7 @@ def Main(display, clock):
     general_time = Chronos()
     field = FieldGenerator(150, 150, initial_infection=-1, spread_times=6)
 
-    charge_station = ChargeStation(capacity=10, charging_speed=100)
+    charge_station = ChargeStation(capacity=4, charging_speed=10)
     charge_station.run()
 
     fc = Forecast(6, 4, 10, interval)
@@ -36,7 +36,7 @@ def Main(display, clock):
     spraying_organizer = Spraying_Organizer(field)
     scanning_map = ScanningMap(150, 150)
 
-    scanning_drones = [ScanningDrone(field, fc, routine='random', scanning_map=scanning_map) for i in
+    scanning_drones = [ScanningDrone(field, fc, routine='fast_brute_force', scanning_map=scanning_map) for i in
                        range(no_scanningdrones)]
 
 
@@ -82,7 +82,7 @@ def Main(display, clock):
                 drone_spray.render(display, camera_pos)
             pygame.display.flip()
         except KeyboardInterrupt:
-            data.plot_data()
+            # data.plot_data()
             exit()
 
 

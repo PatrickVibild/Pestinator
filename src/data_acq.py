@@ -7,6 +7,7 @@ import time
 
 class Data_visualizer(Observer):
     def __init__(self, interval):
+        self.loop_count = 0
         self.field_data = np.array([[100,0,0,0]])
         self.instant_field_data = np.array([[225000,0,0,0]])
         self.interval = interval
@@ -38,7 +39,9 @@ class Data_visualizer(Observer):
         self.field_data= np.vstack([self.field_data, np_data])
 
     def plot_data_field(self):
-        x_axis = np.arange(0,len(self.field_data)*8,step = 8)
+        x_axis = np.arange(0,len(self.spray_data),step = len(self.spray_data)/len(self.field_data))
+        while len(x_axis) > len(self.spray_data):
+            x_axis[-1] = None
         plt.stackplot(x_axis, self.field_data[:,3],self.field_data[:,2],self.field_data[:,1],self.field_data[:,0],colors=self.colormap, labels=self.labels_field)
         plt.legend(loc='upper left')
         plt.title("Field crops' health evolution")
@@ -70,7 +73,7 @@ class Data_visualizer(Observer):
         plt.clf()
         plt.pcolormesh(self.spray_field, cmap = plt.cm.inferno)
         plt.colorbar()
-        bl_act = int(len(self.spray_data)/120)*225000
+        bl_act = int((self.spray_quantity/168)*22500)
         if bl_act == 0: percent = 0.
         else: percent = 100-round((self.spray_quantity/bl_act)*100,2)
         plt.xlabel(str(self.spray_data[-1])+' spray activations, '+str(percent)+'%% saved.')
@@ -82,7 +85,7 @@ class Data_visualizer(Observer):
         self.plot_data_spray()
         self.plot_data_detection()
         self.plot_spray_histogram()
-        print("----------------Plotting finished-----------------")
+        print("----------------Plotting finished----------------- \n ----------------------------------------------------------------\n ----------------------------------------------------------------\n ----------------------------------------------------------------\n ----------------------------------------------------------------\n")
 
     def update_data(self):
         self.spray_data = np.vstack([self.spray_data, self.spray_quantity])
@@ -95,8 +98,13 @@ class Data_visualizer(Observer):
         
         while True:
             try:
+                if self.loop_count > 24*7*2: # hours/day * days/week * weeks of simulation 
+                    self.plot_data()
+                    exit()
                 time.sleep(Chronos.data_waiting())
                 self.update_data()
+                self.loop_count += 1
+
             except KeyboardInterrupt:
                 self.plot_data()
 

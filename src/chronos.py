@@ -11,7 +11,7 @@ class Chronos:
     weather_cycle = 60
     field_cycle = 60*8 # three times a day
     charging_cycle = 0.5
-    data_cycle = 20
+    data_cycle = weather_cycle
 
     def __init__(self):
         self.max_time = 20

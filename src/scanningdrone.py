@@ -55,7 +55,7 @@ class ScanningDrone(Drone, Observer):
             self.fly_random()
 
     def fly_random(self):
-        if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh:
+        if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh or self.weather.night:
             self.charge_drone()
         else:
             x, y = self.scanning_map.obtain_new_direction(self.position_x, self.position_y)
@@ -80,7 +80,7 @@ class ScanningDrone(Drone, Observer):
     def flight_route(self):
         if self.is_charging:
             pass
-        if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh:
+        if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh or self.weather.night:
             self.charge_drone()
             while self.is_charging:
                 pass
@@ -123,7 +123,7 @@ class ScanningDrone(Drone, Observer):
         self.exploring = True if random.randint(0, 1) == 0 else False
 
         while True:
-            if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh:
+            if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh or self.weather.night:
                 self.charge_drone()
             else:
                 self.fly_to(x, y)

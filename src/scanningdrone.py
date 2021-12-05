@@ -37,7 +37,7 @@ class ScanningDrone(Drone, Observer):
         self.scanning_map = scanning_map
 
     def weather_update(self, wind_data: Forecast):
-        print('Field updated the weather')
+        #print('Field updated the weather')
         self.weather = wind_data
 
     def run(self):
@@ -57,6 +57,13 @@ class ScanningDrone(Drone, Observer):
     def fly_random(self):
         if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh or self.weather.night:
             self.charge_drone()
+            while self.is_charging or self.weather.night:
+                pass
+            x = random.randint(0, self.area_x)
+            y = random.randint(0, self.area_y)
+            while self.position_x != x and self.position_y != y:
+                self.forward(x, y)
+                time.sleep(Chronos.drone_waiting())
         else:
             x, y = self.scanning_map.obtain_new_direction(self.position_x, self.position_y)
             while self.position_x != x and self.position_y != y:
@@ -82,7 +89,7 @@ class ScanningDrone(Drone, Observer):
             pass
         if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh or self.weather.night:
             self.charge_drone()
-            while self.is_charging:
+            while self.is_charging or self.weather.night:
                 pass
             x = random.randint(0, self.area_x)
             y = random.randint(0, self.area_y)
@@ -119,12 +126,14 @@ class ScanningDrone(Drone, Observer):
         if seed <= self.area_y:
             x, y = (0, seed)
         else:
-            x, y = (seed - self.area_y, 0)
+            x, y = (seed - self.area_y, self.area_y)
         self.exploring = True if random.randint(0, 1) == 0 else False
 
         while True:
             if (not self.enough_charge() and not self.is_charging) or self.weather.wind_speed >= self.wind_thresh or self.weather.night:
                 self.charge_drone()
+                while self.is_charging or self.weather.night:
+                    pass
             else:
                 self.fly_to(x, y)
                 x, y = swap(x, y)

@@ -12,5 +12,5 @@ class Spraying_Organizer(Observer):
         i, j = coordinates
         self.sick_plants[i][j] = 1
         if coordinates not in self.sick_coordinate_list:
-            print('Sick crop received: {0}, {1}'.format(str(i), str(j)))
+            #print('Sick crop received: {0}, {1}'.format(str(i), str(j)))
             self.sick_coordinate_list.append(coordinates)

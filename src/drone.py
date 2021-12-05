@@ -4,6 +4,7 @@ import time
 import pygame
 from fieldgenerator import FieldGenerator
 from chronos import Chronos
+from parameters import Parameters
 from weather_sim import Forecast
 from abc import ABC, abstractmethod
 
@@ -19,12 +20,12 @@ class Drone(ABC):
         self.position_y = 0
         self.field = world
         self.base_coordinates = [0, 0]
-        self.battery = 2000
-        self.battery_capacity = 2000
+        self.battery = Parameters.drones_battery
+        self.battery_capacity = Parameters.drones_battery
         self.is_charging = False
         self.color = color
         self.weather = weather
-        self.wind_thresh = 8
+        self.wind_thresh = Parameters.wind_threshold
 
     def distance_to_base(self):
         dronePos = [self.position_x, self.position_y]

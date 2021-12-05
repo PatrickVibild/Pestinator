@@ -1,4 +1,5 @@
 from observer import Observer
+from parameters import Parameters
 from weather_sim import Forecast
 
 
@@ -13,6 +14,6 @@ class WeatherDisplay(Observer):
     def weather_update(self, w_data: Forecast):
         print('Field updated the weather')
         self.weather = w_data
-        self.wind = self.weather.wind_speed >= 8
+        self.wind = self.weather.wind_speed >= Parameters.wind_threshold
         self.day_light = not self.weather.night
 

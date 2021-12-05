@@ -7,6 +7,7 @@ from event import Event
 from fieldgenerator import FieldGenerator
 from observer import Observer
 from spraying_organizer import Spraying_Organizer
+from parameters import Parameters
 
 
 class SprayingDrone(Observer, Drone):
@@ -16,8 +17,8 @@ class SprayingDrone(Observer, Drone):
         Drone.__init__(self, world, speed, color)
     #    self.observe('sick_plant', self.add_sick_plant)
         self.sick_plants = [[0 for c in range(world.i)] for r in range(world.j)]
-        self.tank = 500
-        self.tank_capacity = 500
+        self.tank = Parameters.drones_tank
+        self.tank_capacity = Parameters.drones_tank
         self.number = drone_number
         self.grid = grid
 
@@ -41,7 +42,7 @@ class SprayingDrone(Observer, Drone):
         i, j = coordinates
         self.sick_plants[i][j] = 1
         if coordinates not in self.sick_coordinate_list:
-            print('Sick crop received: {0}, {1}'.format(str(i), str(j)))
+            #print('Sick crop received: {0}, {1}'.format(str(i), str(j)))
             self.sick_coordinate_list.append(coordinates)
 
     def charge_fill_drone(self):
@@ -88,7 +89,7 @@ class SprayingDrone(Observer, Drone):
             time.sleep(Chronos.drone_waiting())
         if [self.position_x, self.position_y] == coordinates:
             if self.grid:
-                print("Spraying in a grid around {0}".format(coordinates))
+                #print("Spraying in a grid around {0}".format(coordinates))
                 if self.position_x != 0:
                     self.position_x -= 1
                 if self.position_y != 0:
@@ -101,7 +102,7 @@ class SprayingDrone(Observer, Drone):
                     Event('spray', [self.position_x, self.position_y])
                     self.tank -= 1
                     if [self.position_x, self.position_y] in self.sick_coordinate_list:
-                        print("Removing coordinate from list...")
+                        #print("Removing coordinate from list...")
                         try:
                             self.sick_coordinate_list.remove([self.position_x, self.position_y])
                         except:

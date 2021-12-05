@@ -81,7 +81,10 @@ class FieldGenerator(Observer):
                 spread += 1
                 print(spread)
             else:
-                time.sleep(Chronos.field_waiting())
+                waiting = Chronos.field_waiting()
+                print('------------------------------------------- infecting -----------------------------------------')
+                print('Wind speed:' + str(self.weather.wind_speed))
+                time.sleep(waiting)
             if self.weather is None:
                 continue
             copy_field = self._field
@@ -99,6 +102,7 @@ class FieldGenerator(Observer):
                     self.change_crop_value(x, y, total)
                     self.stats(self._field[x][y])
             self.publish_stats()
+
     def direction_kernel(self):
         wind_kernel = numpy.zeros((len(self.kernel), len(self.kernel[0])))
         direction = self.weather.wind_direction * math.pi / 180

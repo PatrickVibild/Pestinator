@@ -9,6 +9,7 @@ from spraydrone import SprayingDrone
 from WeatherDisplay import WeatherDisplay
 from chronos import Chronos
 from scanning_map import ScanningMap
+from parameters import Parameters
 from weather_sim import Forecast
 from spraying_organizer import Spraying_Organizer
 
@@ -16,8 +17,8 @@ from data_acq import Data_visualizer
 
 pygame.init()
 
-no_sprayingdrones = 3
-no_scanningdrones = 3
+no_sprayingdrones = Parameters.nr_spraying_drones
+no_scanningdrones = Parameters.nr_scanning_drones
 
 
 def Main(display, clock):
@@ -26,9 +27,9 @@ def Main(display, clock):
     data.run()
 
     general_time = Chronos()
-    field = FieldGenerator(150, 150, initial_infection=-1, spread_times=6)
+    field = FieldGenerator(150, 150, initial_infection=Parameters.initial_infection, spread_times=6)
 
-    charge_station = ChargeStation(capacity=4, charging_speed=10)
+    charge_station = ChargeStation(capacity=Parameters.charging_station_capacity, charging_speed=80)
     charge_station.run()
 
     fc = Forecast(6, 4, 10, interval)
@@ -36,11 +37,11 @@ def Main(display, clock):
     spraying_organizer = Spraying_Organizer(field)
     scanning_map = ScanningMap(150, 150)
 
-    scanning_drones = [ScanningDrone(field, fc, routine='fast_brute_force', scanning_map=scanning_map) for i in
+    scanning_drones = [ScanningDrone(field, fc, routine=Parameters.scanning_routine, scanning_map=scanning_map) for i in
                        range(no_scanningdrones)]
 
 
-    spraying_drones = [SprayingDrone(field, spraying_organizer, i, grid=True) for i in range(no_sprayingdrones)]
+    spraying_drones = [SprayingDrone(field, spraying_organizer, i, grid=(not Parameters.precision_spraying)) for i in range(no_sprayingdrones)]
 
 
     camera = Camera(screen_margin=50, camera_speed=20, screen_resolution=screen_resolution, scroll_size=scroll_size)

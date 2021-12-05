@@ -6,15 +6,15 @@ def bound(value, min_v, max_v):
 
 
 class Chronos:
-    time = 1
+    time = 50
     drone_cycle = 0.2
     weather_cycle = 60
-    field_cycle = 60*8 # three times a day
+    field_cycle = 60 * 18 # 4 times every 3 days.
     charging_cycle = 0.5
     data_cycle = weather_cycle
 
     def __init__(self):
-        self.max_time = 20
+        self.max_time = 50
 
     def get_input(self):
         key = pygame.key.get_pressed()
